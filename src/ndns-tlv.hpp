@@ -32,7 +32,8 @@ enum
 
   RRData = 134,
   RRDataSub1 = 141,
-  RRDataSub2 = 142,
+  RRDataRecord = 142,
+  RRUpdateAction = 143,
 
   NDNSRecusive = 151,
   NDNSInteative = 152

@@ -31,33 +31,32 @@ BOOST_AUTO_TEST_SUITE(query)
 
 BOOST_AUTO_TEST_CASE(UnderstandInterest)
 {
-  printbegin("query::UnderstandInterst");
+  printbegin ("query::UnderstandInterst");
   ndns::Query q;
-  q.setFowardingHint(Name("/ucla"));
+  q.setFowardingHint (Name ("/ucla"));
 
-  Name n1("/dns.google.com");
-  Name n2("/www.baidu.com");
-  q.setAuthorityZone(n1);
-  q.setRrLabel(n2);
-  q.setQueryType(ndns::Query::QUERY_DNS_R);
+  Name n1 ("/dns.google.com");
+  Name n2 ("/www.baidu.com");
+  q.setAuthorityZone (n1);
+  q.setRrLabel (n2);
+  q.setQueryType (QUERY_DNS_R);
 
-  Interest interest = q.toInterest();
-  cout<<"InterestName="<<interest.getName()<<endl;
-
+  Interest interest = q.toInterest ();
+  cout << "InterestName=" << interest.getName () << endl;
 
   ndns::Query q2;
   Name name;
-  q2.fromInterest(name, interest);
-  cout<<"AuthZone="<<q2.getAuthorityZone()<<" RRLable="<<q2.getRrLabel()<<endl;
-  BOOST_CHECK_EQUAL(q.getAuthorityZone(), q2.getAuthorityZone());
-  BOOST_CHECK_EQUAL(q.getRrLabel(), q2.getRrLabel());
-  BOOST_CHECK_EQUAL(q.getQueryType(), q2.getQueryType());
-  BOOST_CHECK_EQUAL(q.getFowardingHint(), q2.getFowardingHint());
-  printend("query:UnderstandInterst");
+  q2.fromInterest (name, interest);
+  cout << "AuthZone=" << q2.getAuthorityZone () << " RRLable=" << q2.getRrLabel () << endl;
+  BOOST_CHECK_EQUAL(q.getAuthorityZone (), q2.getAuthorityZone ());
+  BOOST_CHECK_EQUAL(q.getRrLabel (), q2.getRrLabel ());
+  BOOST_CHECK_EQUAL(q.getQueryType (), q2.getQueryType ());
+  BOOST_CHECK_EQUAL(q.getFowardingHint (), q2.getFowardingHint ());
+  printend ("query:UnderstandInterst");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace ndns
+}// namespace tests
+}// namespace ndns
 } // namespace ndn

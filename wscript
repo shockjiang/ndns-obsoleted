@@ -70,14 +70,63 @@ def build (bld):
         includes='src',
         export_includes='src',
     )
-
+"""
     for app in bld.path.ant_glob('tools/*.cpp'):
         bld(features=['cxx', 'cxxprogram'],
             target='bin/%s' % (str(app.change_ext(''))),
             source=['tools/%s' % (str(app))],
             use='ndns-objects',
             )
-
+"""
+    
+    bld(
+      features='cxx cxxprogram',
+      source = "tools/name-server-daemon.cpp",
+      target = "name-server-daemon",
+      use = "ndns-objects"
+    )
+    
+    bld(
+      features='cxx cxxprogram',
+      source = "tools/caching-resolver-daemon.cpp",
+      target = "caching-resolver-daemon",
+      use = "ndns-objects"
+    )
+    
+    bld(
+      features='cxx cxxprogram',
+      source = "tools/dig.cpp",
+      target = "dig",
+      use = "ndns-objects"
+    )
+    
+    bld(
+      features='cxx cxxprogram',
+      source = "tools/zone-build.cpp",
+      target = "zone-build",
+      use = "ndns-objects",
+    )
+    
+    bld(
+      features='cxx cxxprogram',
+      source = "tools/zone-register-root.cpp",
+      target = "zone-register-root",
+      use = "ndns-objects",
+    )
+    
+    bld(
+      features='cxx cxxprogram',
+      source = "tools/zone-register.cpp",
+      target = "zone-register",
+      use = "ndns-objects",
+    )
+    
+    
+    
+    
+    
+    
+>>>>>>> 16f5f40... optimization
     bld.recurse('tests')
 
     # bld.install_files('${SYSCONFDIR}/ndn', 'ndns.conf.sample')

@@ -25,11 +25,9 @@
 #include "boost-test.hpp"
 #include <string>
 
-
 namespace ndn {
 namespace ndns {
 namespace tests {
-
 
 using namespace std;
 
@@ -38,67 +36,72 @@ BOOST_AUTO_TEST_SUITE(response)
 BOOST_AUTO_TEST_CASE(Encode)
 {
 
-  printbegin("response:Encode");
+  printbegin ("response:Encode");
 
   Response re, re2;
-  cout<<"construct a Response Instance"<<endl;
+  cout << "construct a Response Instance" << endl;
   vector<RR> vec;
 
-  RR rr;
+  Zone zone ("/");
+  Zone zone2 ("/net");
+
+  zone.setId (1);
+  zone2.setId (2);
+
+  RRSet rrset1 (zone);
+  RRSet rrset2 (zone2);
+
+  RR rr (rrset1);
+
   std::string ex3 = "www3.ex.com";
   uint32_t id = 203;
-  rr.setRrdata(ex3);
-  rr.setId(id);
-  vec.push_back(rr);
+  rr.setRrData (ex3);
+  rr.setId (id);
+  vec.push_back (rr);
 
+  RR rr2 (rrset2);
 
-  RR rr2;
   std::string ex4 = "www4.ex.com";
   id = 204;
-  rr2.setRrdata(ex4);
-  rr2.setId(id);
-  vec.push_back(rr2);
+  rr2.setRrData (ex4);
+  rr2.setId (id);
+  vec.push_back (rr2);
 
   ndns::Query q;
-  Name n1("/dns.google.com");
-  Name n2("/www.baidu.com");
-  q.setAuthorityZone(n1);
-  q.setRrLabel(n2);
-  q.setQueryType(ndns::Query::QUERY_DNS_R);
-  Interest interest = q.toInterest();
-  Name n3(q.toInterest().getName());
-  n3.appendNumber((uint64_t)1313344);
+  Name n1 ("/");
+  Name n2 ("/net");
+  q.setAuthorityZone (n1);
+  q.setRrLabel (n2);
+  q.setQueryType (QUERY_DNS_R);
+  Interest interest = q.toInterest ();
+  Name n3 (q.toInterest ().getName ());
+  n3.appendNumber ((uint64_t) 1313344);
 
-  re.setQueryName(n3);
-  re.setFreshness(time::milliseconds(4444));
-  re.setRrs(vec);
+  re.setQueryName (n3);
+  re.setFreshness (time::milliseconds (4444));
+  re.setRrs (vec);
 
-
-
-  cout<<"before encode"<<endl;
+  cout << "before encode" << endl;
   //ndn::Block block = re.wireEncode();
   //re.wireEncode();
-  Data data = re.toData();
-  cout<<re.toData()<<endl;
+  Data data = re.toData ();
+  cout << re.toData () << endl;
 
-  cout<<"Encode finishes"<<endl;
+  cout << "Encode finishes" << endl;
 
+  re2.fromData (n2, data);
+  BOOST_CHECK_EQUAL(re.getQueryName (), re2.getQueryName ());
+  BOOST_CHECK_EQUAL(re.getQueryType (), re2.getQueryType ());
+  BOOST_CHECK_EQUAL(re.getResponseType (), re2.getResponseType ());
+  BOOST_CHECK_EQUAL(re.getRrs ().size (), re2.getRrs ().size ());
+  BOOST_CHECK_EQUAL(re.getRrs ()[0], re2.getRrs ()[0]);
+  BOOST_CHECK_EQUAL(re.getRrs ()[1], re2.getRrs ()[1]);
 
-  re2.fromData(n2, data);
-  BOOST_CHECK_EQUAL(re.getQueryName(), re2.getQueryName());
-  BOOST_CHECK_EQUAL(re.getContentType(), re2.getContentType());
-  BOOST_CHECK_EQUAL(re.getResponseType(), re2.getResponseType());
-  BOOST_CHECK_EQUAL(re.getRrs().size(), re2.getRrs().size());
-  BOOST_CHECK_EQUAL(re.getRrs()[0], re2.getRrs()[0]);
-  BOOST_CHECK_EQUAL(re.getRrs()[1], re2.getRrs()[1]);
-
-
-  printend("response:Encode");
+  printend ("response:Encode");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-
-} // namespace tests
-} // namespace ndns
+}// namespace tests
+}// namespace ndns
 } // namespace ndn

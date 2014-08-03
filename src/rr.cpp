@@ -22,59 +22,79 @@
 namespace ndn {
 namespace ndns {
 
-RR::RR()
-  : m_id(0Lu)
-  , m_rrData("ex.com")
+RR::RR ()
+  : m_id (0Lu)
+  , m_rrData ("ex.com")
+  , m_ttl (3600)
+  , m_updateAction (UPDATE_ACTION_NONE)
 {
 }
 
-RR::~RR()
+RR::RR (RRSet& rrset)
+  : m_id (0Lu)
+  , m_rrData ("ex.com")
+  , m_ttl (3600)
+  , m_updateAction (UPDATE_ACTION_NONE)
+  , m_rrset (rrset)
+{
+}
+
+RR::~RR ()
 {
 }
 
 const Block&
-RR::wireEncode() const
+RR::wireEncode () const
 {
-  if (m_wire.hasWire())
+  if (m_wire.hasWire ())
     return m_wire;
   EncodingEstimator estimator;
 
-  size_t estimatedSize = wireEncode(estimator);
-  //std::cout<<"estmatedSize="<<estimatedSize<<std::endl;
-  EncodingBuffer buffer(estimatedSize, 0);
-  wireEncode(buffer);
-  m_wire = buffer.block();
+  size_t estimatedSize = wireEncode (estimator);
+  EncodingBuffer buffer (estimatedSize, 0);
+  wireEncode (buffer);
+  m_wire = buffer.block ();
   return m_wire;
 }
 
-void RR::wireDecode(const Block& wire)
+void
+RR::wireDecode (const Block& wire)
 {
-  if (!wire.hasWire()) {
-    throw Tlv::Error("The supplied block does not contain wire format");
+  if (!wire.hasWire ()) {
+    throw Tlv::Error ("The supplied block does not contain wire format");
   }
 
-  if (wire.type() != ndn::ndns::tlv::RRData)
-    throw Tlv::Error("Unexpected TLV type when decoding Content");
+  if (wire.type () != ndn::ndns::tlv::RRData)
+    throw Tlv::Error ("Unexpected TLV type when decoding Content");
 
   m_wire = wire;
-  m_wire.parse();
+  m_wire.parse ();
 
-  Block::element_const_iterator it = m_wire.elements_begin();
+  Block::element_const_iterator it = m_wire.elements_begin ();
 
-  if (it != m_wire.elements_end() && it->type() == ndn::ndns::tlv::RRDataSub1) {
-    m_id = readNonNegativeInteger(*it);
+  if (it != m_wire.elements_end () && it->type () == ndn::ndns::tlv::RRDataSub1) {
+    m_id = readNonNegativeInteger (*it);
     it++;
-  } else {
-    throw Tlv::Error("not the RRDataSub1 Type");
+  }
+  else {
+    throw Tlv::Error ("not the RRDataSub1 Type");
   }
 
-  if (it != m_wire.elements_end() && it->type() == ndn::ndns::tlv::RRDataSub2) {
+  if (it != m_wire.elements_end () && it->type () == ndn::ndns::tlv::RRDataRecord) {
 
-    m_rrData = std::string(reinterpret_cast<const char*>(it->value()),
-        it->value_size());
+    m_rrData = std::string (reinterpret_cast<const char*> (it->value ()), it->value_size ());
     it++;
-  } else {
-    throw Tlv::Error("not the RRDataSub2 Type");
+  }
+  else {
+    throw Tlv::Error ("not the RRDataRecord Type");
+  }
+
+  if (it != m_wire.elements_end () && it->type () == ndn::ndns::tlv::RRUpdateAction) {
+    m_updateAction = toUpdateAction(std::string (reinterpret_cast<const char*> (it->value ()), it->value_size ()));
+    it++;
+  }
+  else {
+    throw Tlv::Error ("not the RRUpdateAction Type");
   }
 
 }

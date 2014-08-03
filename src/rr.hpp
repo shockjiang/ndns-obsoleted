@@ -21,11 +21,15 @@
 #define NDNS_RR_HPP
 
 #include "ndns-tlv.hpp"
+#include "ndns-label.hpp"
+#include "ndns-enum.hpp"
 
 #include <ndn-cxx/encoding/block.hpp>
 #include <ndn-cxx/interest.hpp>
 
 #include <ndn-cxx/encoding/encoding-buffer.hpp>
+
+#include "rrset.hpp"
 
 namespace ndn {
 namespace ndns {
@@ -33,156 +37,195 @@ namespace ndns {
 class RR
 {
 public:
+  RR (RRSet& rrset);
 
-  enum RRType
-  {
-    NS,
-    TXT,
-    FH,
-    A,
-    AAAA,
-    NDNCERT,
-    UNKNOWN
-  };
-  static std::string toString(const RRType& type)
-  {
-    std::string str;
-
-    switch (type) {
-    case NS:
-      str = "NS";
-      break;
-    case TXT:
-      str = "TXT";
-      break;
-    case FH:
-      str = "FH";
-      break;
-    case A:
-      str = "A";
-      break;
-    case AAAA:
-      str = "AAAA";
-      break;
-    case NDNCERT:
-      str = "NDNCERT";
-      break;
-    default:
-      str = "UNKNOWN";
-      break;
-    }
-    return str;
-  }
-
-  static RRType toRRType(const std::string& str)
-  {
-    RRType atype;
-    if (str == "NS") {
-      atype = NS;
-    } else if (str == "TXT") {
-      atype = TXT;
-    } else if (str == "FH") {
-      atype = FH;
-    } else if (str == "A") {
-      atype = A;
-    } else if (str == "AAAA") {
-      atype = AAAA;
-    } else if (str == "NDNCERT") {
-      atype = NDNCERT;
-    }
-    else {
-      atype = UNKNOWN;
-    }
-    return atype;
-  }
-
-  RR();
-  virtual ~RR();
-
-  const std::string&
-  getRrdata() const
-  {
-
-    return m_rrData;
-  }
-
-  void setRrdata(const std::string& rrdata)
-  {
-    this->m_rrData = rrdata;
-  }
+  RR ();
+  virtual
+  ~RR ();
 
 public:
 
-  uint32_t getId() const
+  void
+  setType (RRType type)
+  {
+    m_rrset.setType(type);
+  }
+
+  void
+  setLabel (const Name& label)
+  {
+    m_rrset.setLabel(label);
+  }
+
+  void
+  setZone(const Zone& zone)
+  {
+    m_rrset.setZone(zone);
+  }
+  void
+  setZone (const Name& zone)
+  {
+    m_rrset.setZone(zone);
+  }
+
+  uint32_t
+  getId () const
   {
     return m_id;
   }
 
-  void setId(uint32_t id)
+  void
+  setId (uint32_t id)
   {
     m_id = id;
   }
 
-  const Block& getWire() const
+  const Block&
+  getWire () const
   {
     return m_wire;
   }
 
-  void setWire(const Block& wire)
+  void
+  setWire (const Block& wire)
   {
     m_wire = wire;
   }
 
-  inline bool operator==(const RR& rr) const
+  inline bool
+  operator== (const RR& rr) const
   {
-    if (this->getRrdata() == rr.getRrdata())
+    if (this->getRrData () == rr.getRrData ())
       return true;
 
     return false;
   }
 
   template<bool T>
-  inline size_t wireEncode(EncodingImpl<T> & block) const
-  {
-    size_t totalLength = 0;
-    const std::string& msg = this->getRrdata();
-    totalLength += prependByteArrayBlock(block, ndn::ndns::tlv::RRDataSub2,
-        reinterpret_cast<const uint8_t*>(msg.c_str()), msg.size());
+    inline size_t
+    wireEncode (EncodingImpl<T> & block) const
+    {
+      size_t totalLength = 0;
 
-    totalLength += prependNonNegativeIntegerBlock(block,
-        ndn::ndns::tlv::RRDataSub1, this->getId());
+      std::string msg = toString(m_updateAction);
+      totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRUpdateAction,
+                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
+                                            msg.size ());
 
-    totalLength += block.prependVarNumber(totalLength);
-    totalLength += block.prependVarNumber(ndn::ndns::tlv::RRData);
-    //std::cout<<"call rr.h wireEncode"<<std::endl;
-    return totalLength;
-  }
+       msg = this->getRrData ();
+      totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRDataRecord,
+                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
+                                            msg.size ());
+
+      totalLength += prependNonNegativeIntegerBlock (block, ndn::ndns::tlv::RRDataSub1,
+                                                     this->getId ());
+
+      totalLength += block.prependVarNumber (totalLength);
+      totalLength += block.prependVarNumber (ndn::ndns::tlv::RRData);
+      //std::cout<<"call rr.h wireEncode"<<std::endl;
+      return totalLength;
+    }
 
   const Block&
-  wireEncode() const;
+  wireEncode () const;
 
   void
-  wireDecode(const Block& wire);
+  wireDecode (const Block& wire);
 
-  //inline std::ostream& operator<<(std::ostream& os, const RR& rr);
+  //////////////////////////////////////////////////////////////////
+
+  uint32_t
+  getTtl () const
+  {
+    return m_ttl;
+  }
+
+  void
+  setTtl (uint32_t ttl)
+  {
+    m_ttl = ttl;
+  }
+
+  const std::string&
+  getRrData () const
+  {
+    return m_rrData;
+  }
+
+  void
+  setRrData (const std::string& rrData)
+  {
+    m_rrData = rrData;
+  }
+
+  const RRSet&
+  getRrset () const
+  {
+    return m_rrset;
+  }
+
+/*
+  RR&
+  operator= (const RR& rr)
+  {
+    return *this;
+  }
+*/
+  UpdateAction
+  getUpdateAction () const
+  {
+    return m_updateAction;
+  }
+
+  void
+  setUpdateAction (UpdateAction updateAction)
+  {
+    m_updateAction = updateAction;
+  }
+
+  void
+  setRrset (const RRSet& rrset)
+  {
+    m_rrset = rrset;
+    //std::cout << "this.rrset="<< m_rrset  <<std::endl;
+    //std::cout << "othe.rrset="<< rrset  <<std::endl;
+  }
+
+
 
 private:
   uint32_t m_id;
-  //unsigned long m_id;
   std::string m_rrData;
+  uint32_t m_ttl;
 
+  /**
+   * the old the label when update. If Any, removes all and add this one.
+   *
+   */
+  UpdateAction m_updateAction;
+
+  RRSet m_rrset;
   mutable Block m_wire;
 };
 //class RR
 
 inline std::ostream&
-operator<<(std::ostream& os, const RR& rr)
+operator<< (std::ostream& os, const RR& rr)
 {
-  os << "RR: Id=" << rr.getId() << " Data=" << rr.getRrdata();
+  os << "RR: Id=" << rr.getId () << " Data=";
+  int maxsize = 10;
+  if (rr.getRrData().size() > maxsize) {
+   os  << rr.getRrData ().substr (0, 10) + "...";
+  }
+  else {
+    os << rr.getRrData();
+  }
+  os << " [RRSet=" << rr.getRrset () << "]";
+  os << " UpdateAction=" << toString(rr.getUpdateAction());
   return os;
 }
 
 } // namespace ndns
 } // namespace ndn
 
-#endif // NDNS_RR_HPP
+#endif

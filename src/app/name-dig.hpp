@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU General Public License along with
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef NAME_DIG_HPP_
-#define NAME_DIG_HPP_
+
+#ifndef NDNS_APP_NAME_DIG_HPP
+#define NDNS_APP_NAME_DIG_HPP
 
 #include "ndn-app.hpp"
 #include "rr.hpp"
@@ -27,70 +28,81 @@
 namespace ndn {
 namespace ndns {
 
-class NameDig: public NDNApp
+class NameDig : public NDNApp
 {
 public:
-  NameDig(const char *programName, const char *prefix);
-  virtual ~NameDig();
+  NameDig (const char *programName, const char *prefix);
+  virtual
+  ~NameDig ();
 
   void
-  onData(const ndn::Interest& interest, Data& data);
+  onData (const ndn::Interest& interest, Data& data);
 
   void
-  onTimeout(const ndn::Interest& interest);
+  onTimeout (const ndn::Interest& interest);
 
   void
-  sendQuery();
+  sendQuery ();
 
   void
-  run();
+  run ();
 
-  const vector<RR>& getRrs() const
+  const vector<RR>&
+  getRrs () const
   {
     return m_rrs;
   }
 
-  void setRrs(const vector<RR>& rrs)
+  void
+  setRrs (const vector<RR>& rrs)
   {
     m_rrs = rrs;
   }
 
-  const Name& getResolverName() const
+  const Name&
+  getResolverName () const
   {
     return m_resolverName;
   }
 
-  void setResolverName(const Name& resolverName)
+  void
+  setResolverName (const Name& resolverName)
   {
     m_resolverName = resolverName;
   }
 
-  const Name& getDstLabel() const
+  const Name&
+  getDstLabel () const
   {
     return m_dstLabel;
   }
 
-  void setDstLabel(const Name& dstLabel)
+  void
+  setDstLabel (const Name& dstLabel)
   {
     m_dstLabel = dstLabel;
   }
 
-  RR::RRType getRrType() const
+  RRType
+  getRrType () const
   {
     return m_rrType;
   }
 
-  void setRrType(RR::RRType rrType)
+  void
+  setRrType (RRType rrType)
   {
     m_rrType = rrType;
   }
 
-  const Response& getResponse() const
+  const Response&
+  getResponse () const
   {
     return response;
   }
 
-  void setResponse(const Response& response)
+  void
+  setResponse (const Response& response)
   {
     this->response = response;
   }
@@ -98,7 +110,7 @@ public:
 private:
   Name m_resolverName;
   Name m_dstLabel;
-  RR::RRType m_rrType;
+  RRType m_rrType;
   vector<RR> m_rrs;
 
   Response response;
@@ -107,4 +119,4 @@ private:
 } /* namespace ndns */
 } /* namespace ndn */
 
-#endif /* NAME_DIG_HPP_ */
+#endif

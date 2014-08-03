@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU General Public License along with
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef NDNS_NAME_SERVER_HPP
-#define NDNS_NAME_SERVER_HPP
 
-#include <boost/asio.hpp>
+#ifndef NDNS_APP_NAME_SERVER_HPP
+#define NDNS_APP_NAME_SERVER_HPP
+
+#include <regex>
+
+//#include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 
 #include <ndn-cxx/face.hpp>
@@ -28,8 +31,10 @@
 
 #include "zone.hpp"
 #include "db/zone-mgr.hpp"
-#include "db/rr-mgr.hpp"
+#include "service/dyndns-mgr.hpp"
+#include "service/query-mgr.hpp"
 #include "query.hpp"
+#include "query-update.hpp"
 #include "response.hpp"
 #include "rr.hpp"
 
@@ -40,19 +45,19 @@ using namespace ndn;
 
 namespace ndn {
 namespace ndns {
-class NameServer: public NDNApp
+class NameServer : public NDNApp
 {
 
 public:
   explicit
-  NameServer(const char *programName, const char *prefix, const char *nameZone,
-      const string dbfile = "src/db/ndns-local.db");
+  NameServer (const char *programName, const char *prefix, const char *nameZone,
+    const string dbfile = "src/db/ndns-local.db");
 
   void
-  onInterest(const Name &name, const Interest &interest);
+  onInterest (const Name &name, const Interest &interest);
 
   void
-  run();
+  run ();
 
 public:
   /*
@@ -74,4 +79,4 @@ public:
 //clcass NameServer
 }//namespace ndns
 } //namespace ndn
-#endif /* NAME_SERVER_HPP_ */
+#endif

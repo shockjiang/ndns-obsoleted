@@ -16,8 +16,9 @@
  * You should have received a copy of the GNU General Public License along with
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef INTERATIVE_QUERY_HPP_
-#define INTERATIVE_QUERY_HPP_
+
+#ifndef NDNS_ITERATIVE_QUERY_HPP
+#define NDNS_ITERATIVE_QUERY_HPP
 
 #include <ndn-cxx/data.hpp>
 #include <ndn-cxx/interest.hpp>
@@ -27,8 +28,8 @@
 #include <iostream>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
-
+//#include <boost/lexical_cast.hpp>
+#include "ndns-enum.hpp"
 #include "query.hpp"
 #include "response.hpp"
 //#include "rr.hpp"
@@ -38,201 +39,133 @@ namespace ndns {
 
 class IterativeQuery
 {
-
 public:
-  enum QuerySteps
-  {
-    NSQuery=1,
-    NackNS,
-    RRQuery,
-    NackRR,
-    FHQuery,
-    AnswerStub,
-    Abort,
-    FinishedSuccessfully,
-    UNKNOWN
-  };
-
-  static std::string
-  toString(const QuerySteps& step)
-  {
-    std::string label;
-    switch (step) {
-    case NSQuery:
-      label = "NSQuery";
-      break;
-    case NackNS:
-      label = "NackNS";
-      break;
-    case RRQuery:
-      label = "RRQuery";
-      break;
-    case NackRR:
-      label = "NackRR";
-      break;
-    case FHQuery:
-      label = "FHQuery";
-      break;
-    case AnswerStub:
-      label = "AnswerStub";
-      break;
-    case Abort:
-      label = "Abort";
-      break;
-    case FinishedSuccessfully:
-      label = "FinishedSuccessfully";
-      break;
-    default:
-      label = "UNKNOW";
-    }
-
-    return label;
-  }
-
-  static QuerySteps
-  toQuerySteps(std::string str)
-  {
-      QuerySteps step = UNKNOWN;
-      if (str == "NSQuery") {
-        step = NSQuery;
-      } else if (str == "NackNS") {
-        step = NackNS;
-      } else if (str == "RRQuery") {
-        step = RRQuery;
-      } else if (str == "NackRR") {
-        step = NackRR;
-      } else if (str == "FHQuery")
-        step = FHQuery;
-      else if (str == "AnswerStub")
-        step = AnswerStub;
-      else if (str == "Abort")
-        step = Abort;
-      else if (str == "FinishedSuccessfully")
-        step = FinishedSuccessfully;
-      else
-        step = UNKNOWN;
-
-      return step;
-  }
-
-
-public:
-  IterativeQuery(const Query&);
+  IterativeQuery (const Query&);
+  virtual
+  ~IterativeQuery ();
 
   virtual void
-  doData(Data& data);
+  doData (Data& data);
 
   virtual bool
-  doTimeout();
+  doTimeout ();
 
-  void abort();
+  void
+  abort ();
 
   virtual const Interest
-  toLatestInterest();
+  toLatestInterest ();
 
-  bool hasFinished()
+  bool
+  hasFinished ()
   {
-    return m_query.getRrLabel().size() == m_finishedLabelNum;
+    return m_query.getRrLabel ().size () == m_finishedLabelNum;
   }
 
-  void addTryNum()
+  void
+  addTryNum ()
   {
     m_tryNum += 1;
   }
 
-  ssize_t getFinishedLabelNum() const
+  ssize_t
+  getFinishedLabelNum () const
   {
     return m_finishedLabelNum;
   }
 
-  void setFinishedLabelNum(ssize_t finishedLabelNum)
+  void
+  setFinishedLabelNum (ssize_t finishedLabelNum)
   {
     m_finishedLabelNum = finishedLabelNum;
   }
 
-  const Query& getQuery() const
+  const Query&
+  getQuery () const
   {
     return m_query;
   }
 
-  const Response& getLastResponse() const
+  const Response&
+  getLastResponse () const
   {
     return m_lastResponse;
   }
 
-  void setLastResponse(const Response& response)
+  void
+  setLastResponse (const Response& response)
   {
     m_lastResponse = response;
   }
 
-  unsigned short getTryMax() const
+  unsigned short
+  getTryMax () const
   {
     return m_tryMax;
   }
 
-  void setTryMax(unsigned short tryMax)
+  void
+  setTryMax (unsigned short tryMax)
   {
     m_tryMax = tryMax;
   }
 
-  unsigned short getTryNum() const
+  unsigned short
+  getTryNum () const
   {
     return m_tryNum;
   }
 
-  void setTryNum(unsigned short tryNum)
+  void
+  setTryNum (unsigned short tryNum)
   {
     m_tryNum = tryNum;
   }
 
-  const Interest& getLastInterest() const
+  const Interest&
+  getLastInterest () const
   {
     return m_lastInterest;
   }
 
-  void setLastInterest(const Interest& lastInterest)
+  void
+  setLastInterest (const Interest& lastInterest)
   {
     m_lastInterest = lastInterest;
 
   }
 
-  QuerySteps getStep() const
+  QuerySteps
+  getStep () const
   {
     return m_step;
   }
-/*
-  void setStep(QuerySteps step)
-  {
-    m_step = step;
-  }
-*/
-  ssize_t getRrLabelLen() const
+
+  ssize_t
+  getRrLabelLen () const
   {
     return m_rrLabelLen;
   }
 
-  void setRrLabelLen(ssize_t rrLabelLen)
+  void
+  setRrLabelLen (ssize_t rrLabelLen)
   {
     m_rrLabelLen = rrLabelLen;
   }
 
-  unsigned int getAuthZoneIndex() const
+  unsigned int
+  getAuthZoneIndex () const
   {
     return m_authZoneIndex;
   }
 
-  void setRrAsNextAuthorityZoneToTry(unsigned int authZoneIndex)
+  void
+  setRrAsNextAuthorityZoneToTry (unsigned int authZoneIndex)
   {
     m_authZoneIndex = authZoneIndex;
   }
 
-  /**
-   * The function is neccesarry since the template of class CachingResolver call setForwardingHint
 
-  void setForwardingHint(const Name& lastForwardingHint)
-  {
-  }
-*/
 protected:
   QuerySteps m_step;
 
@@ -251,12 +184,10 @@ protected:
    */
   ssize_t m_finishedLabelNum;
 
-
   /*
    * used when query the KSK (key signing key), e.g., /net/ndnsim/ksk-1
    */
   ssize_t m_lastFinishedLabelNum;
-
 
   /*
    * the number used to generated the label
@@ -284,15 +215,13 @@ protected:
 };
 
 inline std::ostream&
-operator<<(std::ostream& os, const IterativeQuery iq)
+operator<< (std::ostream& os, const IterativeQuery iq)
 {
-  os << "InterativeQuery: dstLabel=" << iq.getQuery().getRrLabel().toUri()
-      << " currentStep=" << IterativeQuery::toString(iq.getStep())
-      << " finishedLabel=" << iq.getFinishedLabelNum() << " rrLabelen="
-      << iq.getRrLabelLen() << " NextAuZoneIndex=" << iq.getAuthZoneIndex()
-      << " [OriginalQuery: " << iq.getQuery() << "]" << " [LastReponse: "
-      << iq.getLastResponse() << "]" << " [LastInterest: "
-      << iq.getLastInterest() << "]";
+  os << "InterativeQuery: dstLabel=" << iq.getQuery ().getRrLabel ().toUri () << " currentStep="
+     << toString (iq.getStep ()) << " finishedLabel=" << iq.getFinishedLabelNum () << " rrLabelen="
+     << iq.getRrLabelLen () << " NextAuZoneIndex=" << iq.getAuthZoneIndex () << " [OriginalQuery: "
+     << iq.getQuery () << "]" << " [LastReponse: " << iq.getLastResponse () << "]"
+     << " [LastInterest: " << iq.getLastInterest () << "]";
 
   return os;
 }
@@ -300,4 +229,4 @@ operator<<(std::ostream& os, const IterativeQuery iq)
 } /* namespace ndns */
 } /* namespace ndn */
 
-#endif /* INTERATIVE_QUERY_HPP_ */
+#endif

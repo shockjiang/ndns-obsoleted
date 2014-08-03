@@ -16,96 +16,101 @@
  * You should have received a copy of the GNU General Public License along with
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "name-dig.hpp"
 
 namespace ndn {
 namespace ndns {
 
-NameDig::NameDig(const char *programName, const char *prefix)
-  : NDNApp(programName, prefix)
-  , m_resolverName(Name("/"))
-  , m_dstLabel(Name(prefix))
-  , m_rrType(RR::TXT)
+NameDig::NameDig (const char *programName, const char *prefix)
+  : NDNApp (programName, prefix)
+  , m_resolverName (Name ("/"))
+  , m_dstLabel (Name (prefix))
+  , m_rrType (RR_TXT)
 {
   //prefix in this app is the m_dstLabel
-  this->setInterestLifetime(time::milliseconds(10000));
+  this->setInterestLifetime (time::milliseconds (10000));
 }
 
-NameDig::~NameDig()
+NameDig::~NameDig ()
 {
-  // TODO Auto-generated destructor stub
 }
 
-void NameDig::onData(const Interest& interest, Data& data)
+void
+NameDig::onData (const Interest& interest, Data& data)
 {
   Response re;
-  re.fromData(data);
-  cout << "get data:->" << data.getName() << endl;
+  re.fromData (data);
+  cout << "get data:->" << data.getName () << endl;
   cout << "get response:->" << re << endl;
 
   response = re;
 
-  m_rrs = re.getRrs();
+  m_rrs = re.getRrs ();
 
-  vector<RR>::iterator iter = m_rrs.begin();
+  vector<RR>::iterator iter = m_rrs.begin ();
 
-  while (iter != m_rrs.end()) {
+  while (iter != m_rrs.end ()) {
     RR rr = *iter;
     cout << rr << endl;
     iter++;
   }
 
-  this->stop();
+  this->stop ();
 }
 
-void NameDig::sendQuery()
+void
+NameDig::sendQuery ()
 {
   Query q;
-  q.setAuthorityZone(this->m_resolverName);
-  q.setRrLabel(m_dstLabel);
-  q.setQueryType(Query::QUERY_DNS_R);
-  q.setRrType(m_rrType);
+  q.setAuthorityZone (this->m_resolverName);
+  q.setRrLabel (m_dstLabel);
+  q.setQueryType (QUERY_DNS_R);
+  q.setRrType (m_rrType);
 
-  Interest interest = q.toInterest();
-  interest.setInterestLifetime(this->m_interestLifetime);
+  Interest interest = q.toInterest ();
+  interest.setInterestLifetime (this->m_interestLifetime);
   try {
-    m_face.expressInterest(interest,
-        boost::bind(&NameDig::onData, this, _1, _2),
-        boost::bind(&NameDig::onTimeout, this, _1));
-    std::cout << "[* <- *] send Interest: " << interest.getName().toUri()
-        << std::endl;
-  } catch (std::exception& e) {
+    m_face.expressInterest (interest, boost::bind (&NameDig::onData, this, _1, _2),
+                            boost::bind (&NameDig::onTimeout, this, _1));
+    std::cout << "[* <- *] send Interest: " << interest.getName ().toUri () << std::endl;
+  }
+  catch (std::exception& e) {
     m_hasError = true;
-    m_error = e.what();
+    m_error = e.what ();
   }
   m_interestTriedNum += 1;
 }
 
-void NameDig::onTimeout(const Interest& interest)
+void
+NameDig::onTimeout (const Interest& interest)
 {
-  std::cout << "[* !! *] timeout Interest" << interest.getName() << std::endl;
+  std::cout << "[* !! *] timeout Interest" << interest.getName () << std::endl;
 
   if (m_interestTriedNum >= m_interestTriedMax) {
     m_error = "All Interests timeout";
     m_hasError = true;
-    this->stop();
-  } else {
-    sendQuery();
+    this->stop ();
+  }
+  else {
+    sendQuery ();
   }
 
 }
 
-void NameDig::run()
+void
+NameDig::run ()
 {
 
-  this->sendQuery();
+  this->sendQuery ();
 
   try {
-    m_face.processEvents();
-  } catch (std::exception& e) {
-    m_error = e.what();
+    m_face.processEvents ();
+  }
+  catch (std::exception& e) {
+    m_error = e.what ();
     m_hasError = true;
-    this->stop();
+    this->stop ();
   }
 
 }

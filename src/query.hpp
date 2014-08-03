@@ -21,9 +21,12 @@
 #define NDNS_QUERY_HPP
 
 #include "rr.hpp"
+#include "ndns-label.hpp"
 
-
+#include "ndns-enum.hpp"
 #include <ndn-cxx/name.hpp>
+#include <regex>
+#include <map>
 
 namespace ndn {
 namespace ndns {
@@ -31,156 +34,119 @@ namespace ndns {
 class Query
 {
 public:
+  Query ();
 
-  enum QueryType
-  {
-    QUERY_DNS = 1,
-    QUERY_DNS_R,
-    QUERY_KEY,
-    QUERY_UNKNOWN
-  };
+  virtual
+  ~Query ();
 
-  static std::string toString(const QueryType& qType)
-  {
-    std::string label;
-    switch (qType) {
-    case QUERY_DNS:
-      label = "DNS";
-      break;
-    case QUERY_DNS_R:
-      label = "DNS-R";
-      break;
-    case QUERY_KEY:
-      label = "KEY";
-      break;
-    default:
-      label = "UNKNOWN";
-      break;
-    }
-    return label;
+public:
+  virtual Interest
+  toInterest () const;
 
-  }
+  virtual bool
+  fromInterest (const Name &name, const Interest& interest);
 
-  static const QueryType toQueryType(const std::string& str)
-  {
-    QueryType atype;
-    if (str == "DNS") {
-      atype = QUERY_DNS;
-    } else if (str == "DNS-R") {
-      atype = QUERY_DNS_R;
-    } else if (str == "KEY") {
-      atype = QUERY_KEY;
-    }
-    else {
-      atype = QUERY_UNKNOWN;
-    }
-    return atype;
-  }
+  virtual bool
+  fromInterest (const Interest& interest);
 
-  Query();
+  ///////////////////////////////////////////////////////////
 
-  virtual ~Query();
-
-  const Name& getAuthorityZone() const
+  const Name&
+  getAuthorityZone () const
   {
     return m_authorityZone;
   }
 
-  void setAuthorityZone(const Name& authorityZone)
+  void
+  setAuthorityZone (const Name& authorityZone)
   {
     m_authorityZone = authorityZone;
   }
 
-  time::milliseconds getInterestLifetime() const
+  time::milliseconds
+  getInterestLifetime () const
   {
     return m_interestLifetime;
   }
 
-  void setInterestLifetime(time::milliseconds interestLifetime)
+  void
+  setInterestLifetime (time::milliseconds interestLifetime)
   {
     m_interestLifetime = interestLifetime;
   }
 
-  enum QueryType getQueryType() const
+  enum QueryType
+  getQueryType () const
   {
     return m_queryType;
   }
 
-  void setQueryType(enum QueryType queryType)
+  void
+  setQueryType (enum QueryType queryType)
   {
     m_queryType = queryType;
   }
 
-  const Name& getRrLabel() const
+  const Name&
+  getRrLabel () const
   {
     return m_rrLabel;
   }
 
-  void setRrLabel(const Name& rrLabel)
+  void
+  setRrLabel (const Name& rrLabel)
   {
     m_rrLabel = rrLabel;
   }
 
-  const RR::RRType& getRrType() const
+  const RRType&
+  getRrType () const
   {
     return m_rrType;
   }
 
-  void setRrType(const RR::RRType& rrType)
+  void
+  setRrType (const RRType& rrType)
   {
     m_rrType = rrType;
   }
 
-private:
-  template<bool T>
-  size_t
-  wireEncode(EncodingImpl<T> & block) const;
 
-public:
-  Interest
-  toInterest() const;
-
-  bool
-  fromInterest(const Name &name, const Interest& interest);
-
-  bool
-  fromInterest(const Interest& interest);
-
-  const Name& getFowardingHint() const
+  const Name&
+  getFowardingHint () const
   {
     return m_forwardingHint;
   }
 
-  void setFowardingHint(const Name& fowardingHint)
+  void
+  setFowardingHint (const Name& fowardingHint)
   {
     m_forwardingHint = fowardingHint;
   }
 
-public:
 
+public:
   Name m_authorityZone;
   Name m_forwardingHint;
 
   enum QueryType m_queryType;
   time::milliseconds m_interestLifetime;
   Name m_rrLabel;
-  enum RR::RRType m_rrType;
-
+  enum RRType m_rrType;
 
   mutable Block m_wire;
 };
 
 inline std::ostream&
-operator<<(std::ostream& os, const Query& query)
+operator<< (std::ostream& os, const Query& query)
 {
-  os << "Query: authorityZone=" << query.getAuthorityZone().toUri()
-      << " queryType=" << Query::toString(query.getQueryType()) << " rrLabel="
-      << query.getRrLabel().toUri() << " rrType="
-      << RR::toString(query.getRrType());
+  os << "Query: authorityZone=" << query.getAuthorityZone ().toUri () << " queryType="
+     << toString (query.getQueryType ()) << " rrLabel=" << query.getRrLabel ().toUri ()
+     << " rrType=" << toString (query.getRrType ());
   return os;
 }
 
 } // namespace ndns
 } // namespace ndn
 
-#endif // NDNS_QUERY_HPP
+#endif

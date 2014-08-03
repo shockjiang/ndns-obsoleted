@@ -22,47 +22,68 @@
 namespace ndn {
 namespace ndns {
 
-ZoneMgr::ZoneMgr(Zone& zone)
-  : m_zone(zone)
+ZoneMgr::ZoneMgr (Zone& zone)
+  : m_zone (zone)
 {
-  this->lookupId();
+  //this->lookupId();
 }
 
-void ZoneMgr::lookupId(const Name& name)
+void
+ZoneMgr::lookupId (const Name& name)
 {
-  this->open();
-  std::string sql = "SELECT id FROM zones WHERE name=\'" + name.toUri() + "\'";
+  this->open ();
+  std::string sql = "SELECT id FROM zones WHERE name=\'" + name.toUri () + "\'";
   //sql = "SELECT * FROM ZONES";
-  std::cout << "sql=" << sql << std::endl;
+  //std::cout << "sql=" << sql << std::endl;
   //std::cout<<"*this="<<this<<" m_zone.id="<<m_zone.getId()<<" zoneId="<<&m_zone<<std::endl;
-  this->execute(sql, static_callback_setId, this);
+  this->execute (sql, static_callback_setId, this);
   //std::cout<<"*this="<<this<<" m_zone.id="<<m_zone.getId()<<" zoneId="<<&m_zone<<std::endl;
-  this->close();
+  this->close ();
 
 }
-int ZoneMgr::callback_setId(int argc, char **argv, char **azColName)
+int
+ZoneMgr::callback_setId (int argc, char **argv, char **azColName)
 {
   //Zone zone = this->getZone();
-  this->addResultNum();
+  this->addResultNum ();
 
   Zone zone = this->m_zone;
 
   if (argc < 1) {
-    this->setErr("No Zone with Name " + zone.getAuthorizedName().toUri());
+    this->setErr ("No Zone with Name " + zone.getAuthorizedName ().toUri ());
     return -1;
   }
   //std::cout<<"id="<<(uint32_t)std::atoi(argv[0])<<" "<<std::endl;
-  int t1 = std::atoi(argv[0]);
+  int t1 = std::atoi (argv[0]);
 
-  m_zone.setId(t1);
+  m_zone.setId (t1);
 
   return 0;
 }
-void ZoneMgr::lookupId()
+void
+ZoneMgr::lookupId ()
 {
-  lookupId(this->m_zone.getAuthorizedName());
+  lookupId (this->m_zone.getAuthorizedName ());
 }
 
 } //namepsace ndns
 } //namespace ndn
 
+void
+ndn::ndns::ZoneMgr::insert ()
+{
+  this->open ();
+  std::string sql = "INSERT INTO zones (name) VALUES (\'";
+  sql += m_zone.getAuthorizedName ().toUri () + "\')";
+  this->executeOnly (sql, static_callback_insert, this);
+  m_zone.setId (sqlite3_last_insert_rowid (this->m_conn));
+  //std::cout<<"zone info: "<<m_zone<<std::endl;
+  this->close ();
+}
+
+int
+ndn::ndns::ZoneMgr::callback_insert (int argc, char** argv, char** azColName)
+{
+  std::cout << "insert a zone: " << m_zone << std::endl;
+  return 0;
+}

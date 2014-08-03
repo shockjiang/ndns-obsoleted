@@ -1,108 +1,103 @@
-/*
- * rr-mgr.cpp
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/**
+ * Copyright (c) 2014, Regents of the University of California.
  *
- *  Created on: 23 Jul, 2014
- *      Author: shock
+ * This file is part of NDNS (Named Data Networking Domain Name Service).
+ * See AUTHORS.md for complete list of NDNS authors and contributors.
+ *
+ * NDNS is free software: you can redistribute it and/or modify it under the terms
+ * of the GNU General Public License as published by the Free Software Foundation,
+ * either version 3 of the License, or (at your option) any later version.
+ *
+ * NDNS is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "rr-mgr.hpp"
 
 namespace ndn {
 namespace ndns {
-RRMgr::RRMgr(Zone& zone, Query& query, Response& response)
-  : m_count(0U)
-  , m_zone(zone)
-  , m_query(query)
-  , m_response(response)
+
+RRMgr::RRMgr ()
 {
 
 }
 
-RRMgr::~RRMgr()
+RRMgr::~RRMgr ()
 {
-  // TODO Auto-generated destructor stub
 }
 
-int RRMgr::count()
+void
+RRMgr::lookupIds()
 {
-  std::string sql;
-  sql = "SELECT count(*) FROM rrs INNER JOIN rrsets ON rrs.rrset_id=rrsets.id";
-  sql += " WHERE rrsets.zone_id=";
-  sql += std::to_string(m_zone.getId());
-  sql += " AND ";
-  sql += "rrsets.type=\'";
-  sql += RR::toString(m_query.getRrType());
-  sql += "\' AND ";
-  sql += "rrsets.label LIKE\'";
-  sql += m_query.getRrLabel().toUri() + "/%\'";
-
-  std::cout << "sql=" << sql << std::endl;
-  this->execute(sql, static_callback_countRr, this);
-
-  if (this->getStatus() == DBMgr::DBError) {
-    return -1;
-  }
-
-  return this->m_count;
-}
-int RRMgr::callback_countRr(int argc, char **argv, char **azColName)
-{
-  this->addResultNum();
-
-  std::cout << this->getResultNum() << "th result: " << "count=" << argv[0]
-      << std::endl;
-  m_count = std::atoi(argv[0]);
-  return 0;
-}
-
-int RRMgr::lookup()
-{
+  std::vector<RR*>::iterator iter = m_rrs.begin();
   std::string sql;
 
-  sql =
-      "SELECT rrs.ttl, rrs.rrdata, rrs.id FROM rrs INNER JOIN rrsets ON rrs.rrset_id=rrsets.id";
-  sql += " WHERE rrsets.zone_id=";
-  sql += std::to_string(m_zone.getId());
-  sql += " AND ";
-  sql += "rrsets.type=\'";
-  sql += RR::toString(m_query.getRrType());
-  sql += "\' AND ";
-  sql += "rrsets.label=\'";
-  sql += m_query.getRrLabel().toUri() + "\'";
-  sql += " ORDER BY rrs.id";
-
-  std::cout << "sql=" << sql << std::endl;
-  this->execute(sql, static_callback_getRr, this);
-
-  if (this->getStatus() == DBMgr::DBError) {
-    return -1;
+  this->open();
+  while (iter != m_rrs.end()) {
+    RR& rr = **iter;
+    if (rr.getRrset().getZone().getId() == 0 || rr.getRrset().getId() == 0) {
+      std::cout <<" One Id is not initialized. Zone.id="
+                << rr.getRrset().getZone().getId()
+                << " RRSet.id=" << rr.getRrset().getId() << std::endl;
+    }
+    else {
+      sql = "SELECT id FROM rrs WHERE rrset_id=";
+      sql += std::to_string(rr.getRrset().getId());
+      sql += " AND rrdata=\'" + rr.getRrData() + "\'";
+      this->executeOnly(sql, static_callback_getInt, this);
+    rr.setId(this->m_tempInt);
+    }
+    iter++;
   }
 
-  //m_response.setQueryName(m_query.getAuthorityZone());
-  return 0;
+  this->close();
 }
 
-int RRMgr::callback_getRr(int argc, char **argv, char **azColName)
+void
+RRMgr::remove()
 {
-  this->addResultNum();
-  if (argc < 1) {
-    this->setErr(
-        "No RRType=" + RR::toString(m_query.getRrType()) + " and label="
-            + m_query.getRrLabel().toUri() + " and zone="
-            + m_zone.getAuthorizedName().toUri());
-    return 0;
-  }
 
-  std::cout << this->getResultNum() << "th result: " << "id=" << argv[2]
-      << " ttl=" << argv[0] << " rrdata=" << argv[1] << std::endl;
-
-  m_response.setFreshness(time::milliseconds(std::atoi(argv[0])));
-
-  m_response.addRr(std::atoi(argv[2]), argv[1]);
-  //std::cout<<"after add a Rr: current size="<<m_response.getRrs().size()<<std::endl;
-  //m_response.setFreshness(time::milliseconds(std::atoi(argv[0])));
-  return 0;
 }
 
-}  //namespace ndnsn
-} /* namespace ndn */
+void
+RRMgr::replace_all()
+{
+
+}
+
+
+
+void
+RRMgr::insert ()
+{
+  std::string sql;
+
+  std::vector<RR*>::iterator iter = m_rrs.begin ();
+
+  this->open ();
+  while (iter != m_rrs.end ()) {
+    RR& rr = **iter;
+    sql = "INSERT INTO rrs(rrset_id, ttl, rrdata) VALUES (";
+    sql += std::to_string (rr.getRrset ().getId ()) + ", ";
+    sql += std::to_string (rr.getTtl ()) + ", ";
+    sql += "\'" + rr.getRrData () + "\'";
+    sql += ")";
+
+    this->executeOnly (sql, static_callback_getInt, this);
+    rr.setId(this->m_tempInt);
+
+
+    iter++;
+  }
+
+  this->close ();
+
+}
+
+} // namespace ndns
+} // namespace ndn

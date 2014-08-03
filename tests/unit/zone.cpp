@@ -18,7 +18,6 @@
  */
 
 // #include "src/zone.h"
-
 namespace ndn {
 namespace ndns {
 namespace tests {

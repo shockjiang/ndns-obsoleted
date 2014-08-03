@@ -17,7 +17,6 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
  * Copyright (c) 2014, Regents of the University of California.
@@ -55,30 +54,27 @@ BOOST_AUTO_TEST_SUITE(nameServer)
 BOOST_AUTO_TEST_CASE(Protocol)
 {
   string label = "nameServer::Protocol";
-  printbegin(label);
+  printbegin (label);
 
-  Name name("/DNS/net/NS");
+  Name name ("/DNS/net/NS");
   Interest interest;
-  interest.setName(name);
-
+  interest.setName (name);
 
   string program = "name-server-daemon";
   string prefix = "/";
 
-  const char* pro = program.c_str();
-  const char * pre = prefix.c_str();
-  NameServer server(pro, pre, pre);
+  const char* pro = program.c_str ();
+  const char * pre = prefix.c_str ();
+  NameServer server (pro, pre, pre);
 
-  server.onInterest(name, interest);
+  //server.onInterest (name, interest);
 
-
-
-  printend(label);
+  printend (label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace ndns
+}// namespace tests
+}// namespace ndns
 } // namespace ndn
 

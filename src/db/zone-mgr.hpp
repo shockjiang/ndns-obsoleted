@@ -17,8 +17,8 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NDNS_ZONE_MGR_CPP
-#define NDNS_ZONE_MGR_CPP
+#ifndef NDNS_DB_ZONE_MGR_HPP
+#define NDNS_DB_ZONE_MGR_HPP
 
 #include <sqlite3.h>
 
@@ -29,44 +29,67 @@
 namespace ndn {
 namespace ndns {
 
-class ZoneMgr: public DBMgr
+class ZoneMgr : public DBMgr
 {
 
 public:
-  ZoneMgr(Zone& zone);
+  ZoneMgr (Zone& zone);
 
 public:
   void
-  lookupId(const Name& name);
+  lookupId (const Name& name);
 
   void
-  lookupId();
+  lookupId ();
 
-  const Zone& getZone() const
+  int
+  callback_setId (int argc, char **argv, char **azColName);
+
+  static int
+  static_callback_setId (void *param, int argc, char **argv, char **azColName)
+  {
+
+    ZoneMgr *mgr = reinterpret_cast<ZoneMgr*> (param);
+    return mgr->callback_setId (argc, argv, azColName);
+  }
+
+  void
+  insert ();
+
+  int
+  callback_insert (int argc, char **argv, char **azColName);
+
+  static int
+  static_callback_insert (void *param, int argc, char **argv, char **azColName)
+  {
+
+    ZoneMgr *mgr = reinterpret_cast<ZoneMgr*> (param);
+    return mgr->callback_insert (argc, argv, azColName);
+  }
+
+  const Zone&
+  getZone () const
   {
     return m_zone;
   }
 
-  void setZone(const Zone& zone)
+  void
+  setZone (const Zone& zone)
   {
     this->m_zone = zone;
   }
 
-  int
-  callback_setId(int argc, char **argv, char **azColName);
-
-  static int static_callback_setId(void *param, int argc, char **argv,
-      char **azColName)
+  /*
+  ZoneMgr&
+  operator= (const ZoneMgr& rr)
   {
-
-    ZoneMgr *mgr = reinterpret_cast<ZoneMgr*>(param);
-    return mgr->callback_setId(argc, argv, azColName);
+    return *this;
   }
-
+  */
 private:
   Zone& m_zone;
 };
-//class ZoneMgr
+
 
 }//namespace ndns
 } //namespace ndn

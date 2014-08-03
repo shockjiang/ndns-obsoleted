@@ -25,49 +25,53 @@
 namespace ndn {
 namespace ndns {
 
-DBMgr::DBMgr()
-  : m_dbfile("src/db/ndns-local.db")
-  , m_conn(0)
-  , m_reCode(-1)
-  , m_status(DBClosed)
-  , m_resultNum(0)
+DBMgr::DBMgr ()
+  : m_dbfile ("src/db/ndns-local.db")
+  , m_conn (0)
+  , m_reCode (-1)
+  , m_status (DBClosed)
+  , m_resultNum (0)
+  , m_tempInt (-1)
 {
   std::fstream file;
-  file.open(m_dbfile, std::ios::in);
+  file.open (m_dbfile, std::ios::in);
   if (file) {
-    std::cout << "database file " << m_dbfile << " does exist" << std::endl;
-  } else {
+    //std::cout << "database file " << m_dbfile << " does exist" << std::endl;
+  }
+  else {
     std::cout << "database file " << m_dbfile << " does not exist" << std::endl;
   }
 
 }
 
-DBMgr::~DBMgr()
+DBMgr::~DBMgr ()
 {
 }
 
-void DBMgr::open()
+void
+DBMgr::open ()
 {
   if (m_status == DBConnected)
     return;
 
-  m_reCode = sqlite3_open(this->m_dbfile.c_str(), &(this->m_conn));
+  m_reCode = sqlite3_open (this->m_dbfile.c_str (), &(this->m_conn));
   if (m_reCode != SQLITE_OK) {
     m_err = "Cannot connect to the db: " + this->m_dbfile;
     m_status = DBError;
-    //exit(1);
-  } else {
-    std::cout << "connect to the db: " << m_dbfile << std::endl;
+  }
+  else {
+    //std::cout << "connect to the db: " << m_dbfile << std::endl;
   }
   m_status = DBConnected;
 }
 
-void DBMgr::close()
+void
+DBMgr::close ()
 {
   if (m_status == DBClosed)
     return;
 
-  m_reCode = sqlite3_close(this->m_conn);
+  m_reCode = sqlite3_close (this->m_conn);
   if (m_reCode != SQLITE_OK) {
     m_err = "Cannot close the db: " + this->m_dbfile;
     m_status = DBError;
@@ -75,23 +79,111 @@ void DBMgr::close()
   m_status = DBClosed;
 }
 
-void DBMgr::execute(std::string sql,
-    int (*callback)(void*, int, char**, char**), void * paras)
+void
+DBMgr::execute (std::string sql, int
+(*callback) (void*, int, char**, char**), void * paras)
 {
   if (m_status == DBClosed)
-    this->open();
+    this->open ();
 
-  clearResultNum();
+  this->executeOnly (sql, callback, paras);
+
+  this->close ();
+}
+
+void
+DBMgr::executeOnly (std::string sql, int
+(*callback) (void*, int, char**, char**), void * paras)
+{
+  if (m_status == DBClosed) {
+    std::cout << " the DB is closed " << std::endl;
+    return;
+  }
+
+  this->printSQL (sql);
+  clearResultNum ();
   char *err_msg;
-  m_reCode = sqlite3_exec(m_conn, sql.c_str(), callback, paras, &err_msg);
+  //std::cout<<"to execute"<<std::endl;
+  m_reCode = sqlite3_exec (m_conn, sql.c_str (), callback, paras, &err_msg);
+
+  //std::cout<<"finish execute. reCode="<<m_reCode<<" SQLITE_OK="<<SQLITE_OK<<std::endl;
   if (m_reCode != SQLITE_OK) {
     m_status = DBError;
-    this->m_err.append(err_msg);
-    std::cout << this->m_err << std::endl;
+    this->m_err.append (err_msg);
+    std::cout << "DBError: " << this->m_err << std::endl;
   }
-  this->close();
+}
+
+/*@brief execute a single sql command with opening and closing the db connection
+ * only the last sql execute call the callback function
+ */
+void
+DBMgr::execute (std::vector<std::string> sqls, int
+(*callback) (void*, int, char**, char**), void * paras)
+{
+  if (m_status == DBClosed)
+    this->open ();
+
+  this->executeOnly (sqls, callback, paras);
+
+  this->close ();
+}
+
+/*
+ * @brief only the last sql execute call the callback function, the db
+ * connection should be opened and closed mannually
+ */
+void
+DBMgr::executeOnly (std::vector<std::string> sqls, int
+(*callback) (void*, int, char**, char**), void * paras)
+{
+  char *err_msg;
+  std::vector<std::string>::size_type num = sqls.size ();
+  std::string sql;
+  for (int i = 0; i < num - 2; i++) {
+    sql = sqls[i];
+    this->printSQL (sql);
+    m_reCode = sqlite3_exec (m_conn, sql.c_str (), this->static_callback_doNothing, paras,
+                             &err_msg);
+    if (m_reCode != SQLITE_OK) {
+      m_status = DBError;
+      this->m_err.append (err_msg);
+      std::cout << "DBError: " << this->m_err << std::endl;
+      return;
+    } //if
+  } //for
+
+  //the last sql
+  sql = sqls[num - 1];
+  this->printSQL (sql);
+
+  m_reCode = sqlite3_exec (m_conn, sql.c_str (), callback, paras, &err_msg);
+  if (m_reCode != SQLITE_OK) {
+    m_status = DBError;
+    this->m_err.append (err_msg);
+    std::cout << "DBError: " << this->m_err << std::endl;
+  }
+}
+
+int
+DBMgr::callback_getInt (int argc, char **argv, char** azColNames)
+{
+  this->m_tempInt = std::atoi (argv[0]);
+  return 0;
+}
+int
+DBMgr::callback_getStr (int argc, char **argv, char** azColNames)
+{
+  this->m_tempStr = std::atoi (argv[0]);
+  return 0;
+}
+
+int
+DBMgr::callback_get_insert_id (int argc, char **argv, char** azColNames)
+{
+  this->m_tempInt = std::atoi (argv[0]);
+  return 0;
 }
 
 } //namespace ndns
 } //namespace ndn
-

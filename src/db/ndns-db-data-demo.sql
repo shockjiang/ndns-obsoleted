@@ -42,14 +42,14 @@ insert into rrsets (id, zone_id, label, class, type, ndndata) values
                    (27,  3,     "/net/ndnsim/h2",   NULL, "FH", NULL),
                    (28,  5,     "/net/ndnsim/git/doc/h1", NULL, "FH", NULL),
                    
-                   /* NDNCERT of domain */
-                   (11,  3,     "/www/dsk-1", NULL, "NDNCERT", NULL),
-                   (12,  3,     "/www/ksk-1", NULL, "NDNCERT", NULL),
-                   (13,  3,     "/dsk-1",     NULL, "NDNCERT", NULL),
-                   (14,  2,     "/ndnsim/ksk-1", NULL, "NDNCERT", NULL),
-                   (15,  2,     "/dsk-1", NULL, "NDNCERT", NULL),
-                   (16,  1,     "/net/ksk-1", NULL, "NDNCERT", NULL),
-                   (17,  1,     "/root",     NULL, "NDNCERT", NULL),
+                   /* ID-CERT of domain */
+                   (11,  3,     "/www/dsk-1", NULL, "ID-CERT", NULL),
+                   (12,  3,     "/www/ksk-1", NULL, "ID-CERT", NULL),
+                   (13,  3,     "/dsk-1",     NULL, "ID-CERT", NULL),
+                   (14,  2,     "/ndnsim/ksk-1", NULL, "ID-CERT", NULL),
+                   (15,  2,     "/dsk-1", NULL, "ID-CERT", NULL),
+                   (16,  1,     "/net/ksk-1", NULL, "ID-CERT", NULL),
+                   (17,  1,     "/root",     NULL, "ID-CERT", NULL),
                    
                    /* Mobility Support for Skype (NDN rtc in the future) */
                    (100,  1,    "/com",         NULL, "NS", NULL),
@@ -89,7 +89,7 @@ insert into rrs (id, rrset_id, ttl, rrdata) values
                 (27,  27,   3000, "/ucla"),
                 (28,  28,   3000, "/ucla"),
                 
-                 /* NDNCERT*/
+                 /* ID-CERT*/
                 (12,11,3000, "/net/ndnsim/DNS/www/dsk-1:010010101101010101"),
                 (13,12,3000, "/net/ndnsim/DNS/www/ksk-1:0101111010001111110"),
                 (14,13,3000, "/net/ndnsim/DNS/dsk-1:1010110101"),

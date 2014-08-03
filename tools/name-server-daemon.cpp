@@ -18,103 +18,90 @@
  */
 
 #include "app/name-server.hpp"
-#include "boost/program_options.hpp"
-#include "boost/filesystem.hpp"
+#include <boost/program_options.hpp>
+//#include "boost/filesystem.hpp"
 
-int main(int argc, char * argv[])
+int
+main (int argc, char * argv[])
 {
-  string route = "/";
-  string zoneName = "/";
-  string dbfile="src/db/ndns-local.db";
-  string hint = "/";
+  string route = "";
+  string zoneName = "";
+  string dbfile = "src/db/ndns-local.db";
+  string hint = "";
 
-  try{
+  try {
 
     namespace po = boost::program_options;
     po::variables_map vm;
 
+    po::options_description generic ("Generic Options");
+    generic.add_options () ("help,h", "print help message");
 
-    po::options_description generic("Generic Options");
-    generic.add_options()
-        ("help,h", "print help message")
-        ;
+    po::options_description config ("Configuration");
+    config.add_options () ("dbfile,f", po::value<std::string> (&dbfile),
+                           "set database file. default: src/db/ndns-local.db") (
+      "hint,H", po::value<std::string> (&hint), "set Forwarding Hint, which is disable by default");
 
-
-    po::options_description config("Configuration");
-    config.add_options()
-             ("dbfile,f", po::value<std::string>(&dbfile), "set database file. default: src/db/ndns-local.db")
-             ("hint,H", po::value<std::string>(&hint), "set Forwarding Hint, which is disable by default")
-             ;
-
-
-    po::options_description hidden("Hidden Options");
-    hidden.add_options()
-             ("prefix,p", po::value<string>(&route), "routable prefix of the server")
-             ("zone,z", po::value<string>(&zoneName), "name of the zone")
-            ;
+    po::options_description hidden ("Hidden Options");
+    hidden.add_options () ("prefix,p", po::value<string> (&route), "routable prefix of the server") (
+      "zone,z", po::value<string> (&zoneName), "name of the zone");
 
     po::positional_options_description postion;
-    postion.add("prefix", 1);
-    postion.add("zone", 1);
-
-
-
+    postion.add ("prefix", 1);
+    postion.add ("zone", 1);
 
     po::options_description cmdline_options;
-    cmdline_options.add(generic).add(config).add(hidden);
+    cmdline_options.add (generic).add (config).add (hidden);
 
     po::options_description config_file_options;
-    config_file_options.add(config).add(hidden);
+    config_file_options.add (config).add (hidden);
 
-    po::options_description visible("Allowed options");
-    visible.add(generic).add(config);
+    po::options_description visible ("Allowed options");
+    visible.add (generic).add (config);
 
+    po::parsed_options parsed =
+      po::command_line_parser (argc, argv).options (cmdline_options).positional (postion).run ();
 
-    po::parsed_options parsed = po::command_line_parser(argc, argv).options(cmdline_options).positional(postion).run();
+    po::store (parsed, vm);
+    po::notify (vm);
 
+    if (zoneName == "")
+      zoneName = route;
 
-    po::store(parsed, vm);
-    po::notify(vm);
-
-    if (vm.count("help"))
-    {
-      cout<<"E.g: name-server-daemon /name/of/zone /routable/prefix/announced"<<endl;
-      cout<<visible<<endl;
+    if (vm.count ("help")) {
+      cout << "E.g: name-server-daemon /name/of/zone /routable/prefix/announced" << endl;
+      cout << visible << endl;
       return 0;
     }
 
-    cout<<"zone="<<zoneName<<" routablePrefix="<<route<<" dbfile="<<dbfile<<endl;
+    cout << "zone=" << zoneName << " routablePrefix=" << route << " dbfile=" << dbfile << endl;
   }
-  catch(const std::exception& ex)
-  {
-          cout << "Parameter Error: " << ex.what() << endl;
-          return 0;
+  catch (const std::exception& ex) {
+    cout << "Parameter Error: " << ex.what () << endl;
+    return 0;
   }
-  catch(...)
-  {
-          cout << "Parameter Unknown error" << endl;
-          return 0;
+  catch (...) {
+    cout << "Parameter Unknown error" << endl;
+    return 0;
   }
 
+  ndn::ndns::NameServer server (argv[0], route.c_str (), zoneName.c_str (), dbfile);
 
+  if (hint != "") {
+    server.setEnableForwardingHint (1);
+    server.setForwardingHint (Name (hint));
+  }
 
-	ndn::ndns::NameServer server(argv[0], route.c_str(), zoneName.c_str(), dbfile);
+  server.run ();
 
-	if (hint != "/") {
-	  server.setEnableForwardingHint(1);
-	  server.setForwardingHint(Name(hint));
-	}
+  cout << "the server ends with hasError=" << server.hasError () << endl;
 
-
-	server.run();
-
-	cout<<"the server ends with hasError="<<server.hasError()<<endl;
-
-	if (server.hasError()){
-		return 0;
-	} else {
-		return 1;
-	}
+  if (server.hasError ()) {
+    return 0;
+  }
+  else {
+    return 1;
+  }
 
 }
 

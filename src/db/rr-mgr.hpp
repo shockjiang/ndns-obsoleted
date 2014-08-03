@@ -17,82 +17,64 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef RR_MGR_HPP
-#define RR_MGR_HPP
+#ifndef NDNS_DB_RR_MGR_HPP
+#define NDNS_DB_RR_MGR_HPP
 
 #include "db-mgr.hpp"
-#include "query.hpp"
-#include "response.hpp"
+#include "rr.hpp"
 #include "zone.hpp"
+#include "rrset.hpp"
+//#include <boost/smart_ptr/shared_ptr.hpp>
+//#include <boost/ptr_container/ptr_container.hpp>
 
 namespace ndn {
 namespace ndns {
-class RRMgr: public DBMgr
+
+class RRMgr : public DBMgr
 {
 public:
-  RRMgr(Zone& zone, Query& query, Response& response);
-  virtual ~RRMgr();
+  RRMgr ();
+  virtual
+  ~RRMgr ();
 
-public:
-  int lookup();
+  void
+  lookupIds();
 
-  int callback_getRr(int argc, char **argv, char **azColName);
+  void
+  insert ();
 
-  static int static_callback_getRr(void *param, int argc, char **argv,
-      char **azColName)
+
+  void
+  remove();
+
+  void
+  replace_all();
+
+  inline void
+  addRR (RR& rr)
   {
-    RRMgr *mgr = reinterpret_cast<RRMgr*>(param);
-    return mgr->callback_getRr(argc, argv, azColName);
+    //boost::shared_ptr<RR> rrP(&rr);
+    m_rrs.push_back (&rr);
   }
 
-  int count();
-  int callback_countRr(int argc, char **argv, char **azColName);
-
-  static int static_callback_countRr(void *param, int argc, char **argv,
-      char **azColName)
+  inline void
+  addRR (RR* rr)
   {
-    RRMgr *mgr = reinterpret_cast<RRMgr*>(param);
-    return mgr->callback_countRr(argc, argv, azColName);
+    m_rrs.push_back (rr);
   }
 
-  const Query& getQuery() const
+  const std::vector<RR*>&
+  getRrs () const
   {
-    return m_query;
-  }
-
-  void setQuery(const Query& query)
-  {
-    m_query = query;
-  }
-
-  const Response& getResponse() const
-  {
-    return m_response;
-  }
-
-  void setResponse(const Response& response)
-  {
-    m_response = response;
-  }
-
-  const Zone& getZone() const
-  {
-    return m_zone;
-  }
-
-  void setZone(const Zone& zone)
-  {
-    m_zone = zone;
+    return m_rrs;
   }
 
 private:
-  unsigned int m_count;
-  Zone& m_zone;
-  Query& m_query;
-  Response& m_response;
+  std::vector<RR*> m_rrs;
+
 };
 
-} //namespace ndns
+} /* namespace ndns */
 } /* namespace ndn */
 
-#endif /* RR_MGR_HPP_ */
+#endif

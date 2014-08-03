@@ -20,9 +20,9 @@
 #ifndef NDNS_RESPONSE_HPP
 #define NDNS_RESPONSE_HPP
 
-#include <boost/asio.hpp>
+//#include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
+//#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/noncopyable.hpp>
 
 #include <ndn-cxx/face.hpp> // /usr/local/include
@@ -31,11 +31,16 @@
 
 #include <ndn-cxx/encoding/block-helpers.hpp>
 #include <ndn-cxx/encoding/block.hpp>
+<<<<<<< HEAD
+=======
+//#include <ndn-cxx/encoding/tlv-ndnd.hpp>
+>>>>>>> 16f5f40... optimization
 
 #include <vector>
 
 #include "ndns-tlv.hpp"
-#include "query.hpp"
+#include "ndns-enum.hpp"
+#include "ndns-label.hpp"
 #include "rr.hpp"
 
 namespace ndn {
@@ -44,170 +49,158 @@ namespace ndns {
 class Response
 {
 public:
-  enum ResponseType
-  {
-    NDNS_Resp,
-    NDNS_Nack,
-    NDNS_Auth,
-    UNKNOWN
-  };
 
-  static std::string toString(ResponseType responseType)
-  {
-    std::string label;
-    switch (responseType) {
-    case NDNS_Resp:
-      label = "NDNS Resp";
-      break;
-    case NDNS_Nack:
-      label = "NDNS Nack";
-      break;
-    case NDNS_Auth:
-      label = "NDNS Auth";
-      break;
-    default:
-      label = "UNKNOWN";
-      break;
-    }
-    return label;
-  }
+  Response ();
+  virtual
+  ~Response ();
 
-  static ResponseType toResponseType(const std::string& str)
-  {
-    ResponseType atype;
-    if (str == "NDNS Resp") {
-      atype = NDNS_Resp;
-    } else if (str == "NDNS Nack") {
-      atype = NDNS_Nack;
-    } else if (str == "NDNS Auth") {
-      atype = NDNS_Auth;
-    } else {
-      atype = UNKNOWN;
-    }
-    return atype;
-  }
 
-  Response();
-  virtual ~Response();
-
-  inline void addRr(const uint32_t rrId, const std::string rrData)
+  inline void
+  addRr (RR rr)
   {
-    RR rr;
-    rr.setId(rrId);
-    rr.setRrdata(rrData);
-    this->m_rrs.push_back(rr);
+    this->m_rrs.push_back (rr);
   }
 
   const Block&
-  wireEncode() const;
+  wireEncode () const;
 
   void
-  wireDecode(const Block& wire);
+  wireDecode (const Block& wire);
 
   template<bool T>
-  size_t
-  wireEncode(EncodingImpl<T> & block) const;
+    size_t
+    wireEncode (EncodingImpl<T> & block) const;
 
   void
-  fromData(const Name& name, const Data& data);
+  fromData (const Name& name, const Data& data);
 
   void
-  fromData(const Data &data);
+  fromData (const Data &data);
 
   Data
-  toData() const;
+  toData () const;
 
-  const std::string getStringRRs() const
+  const std::string
+  getStringRRs () const
   {
     std::stringstream str;
     str << "[";
-    std::vector<RR>::const_iterator iter = m_rrs.begin();
-    while (iter != m_rrs.end()) {
+    std::vector<RR>::const_iterator iter = m_rrs.begin ();
+    while (iter != m_rrs.end ()) {
       str << " " << *iter;
       iter++;
     }
     str << "]";
-    return str.str();
+    return str.str ();
   }
 
-  Query::QueryType getContentType() const
+  QueryType
+  getQueryType () const
   {
-    return m_contentType;
+    return m_queryType;
   }
 
-  void setContentType(Query::QueryType contentType)
+  void
+  setQueryType (QueryType queryType)
   {
-    m_contentType = contentType;
+    m_queryType = queryType;
   }
 
-  time::milliseconds getFreshness() const
+  time::milliseconds
+  getFreshness () const
   {
     return m_freshness;
   }
 
-  void setFreshness(time::milliseconds freshness)
+  void
+  setFreshness (time::milliseconds freshness)
   {
     m_freshness = freshness;
   }
 
-  const Name& getQueryName() const
+  const Name&
+  getQueryName () const
   {
     return m_queryName;
   }
 
-  void setQueryName(const Name& queryName)
+  void
+  setQueryName (const Name& queryName)
   {
     m_queryName = queryName;
   }
 
-  ResponseType getResponseType() const
+  ResponseType
+  getResponseType () const
   {
     return m_responseType;
   }
 
-  void setResponseType(ResponseType responseType)
+  void
+  setResponseType (ResponseType responseType)
   {
     m_responseType = responseType;
   }
 
-  const std::vector<RR>& getRrs() const
+  const std::vector<RR>&
+  getRrs () const
   {
     return m_rrs;
   }
 
-  void setRrs(const std::vector<RR>& rrs)
+  void
+  setRrs (const std::vector<RR>& rrs)
   {
     m_rrs = rrs;
   }
 
+  void
+  setRrZones(const Zone& zone)
+  {
+    std::vector<RR>::iterator iter = m_rrs.begin();
+    while (iter != m_rrs.end()) {
+      RR& rr = *iter;
+      rr.setZone(zone);
+    }
+  }
 private:
   time::milliseconds m_freshness;
+  /*
+   * this is the whole name of the response.
+   */
   Name m_queryName;
-  //std::string m_serial;
-  Query::QueryType m_contentType;
+
+  QueryType m_queryType;
+  Name m_authorityZone;
+  Name m_forwardingHint;
+  Name m_rrLabel;
+  enum RRType m_rrType;
+
   ResponseType m_responseType;
-  //unsigned int m_numberOfRR;
   std::vector<RR> m_rrs;
   mutable Block m_wire;
 
 };
 
 inline std::ostream&
-operator<<(std::ostream& os, const Response& response)
+operator<< (std::ostream& os, const Response& response)
 {
-  os << "Response: queryName=" << response.getQueryName().toUri()
-      << " responseType=" << Response::toString(response.getResponseType())
-      << " contentType=" << Query::toString(response.getContentType()) << " [";
-  std::vector<RR>::const_iterator iter = response.getRrs().begin();
-  while (iter != response.getRrs().end()) {
+  os << "Response: queryName=" << response.getQueryName ().toUri () << " responseType="
+     << toString (response.getResponseType ()) << " queryType="
+     << toString (response.getQueryType ()) << " [";
+
+  std::vector<RR>::const_iterator iter = response.getRrs ().begin ();
+  while (iter != response.getRrs ().end ()) {
     os << " " << *iter;
     iter++;
   }
+
   os << "]";
+
   return os;
 }
 
 } // namespace ndns
 } // namespace ndn
 
-#endif // NDNS_RESPONSE_HPP
+#endif

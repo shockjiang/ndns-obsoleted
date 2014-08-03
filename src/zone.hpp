@@ -20,9 +20,10 @@
 #ifndef NDNS_ZONE_HPP
 #define NDNS_ZONE_HPP
 
-#include "rr.hpp"
-#include "query.hpp"
-#include "response.hpp"
+//#include "rr.hpp"
+//#include "query.hpp"
+//#include "response.hpp"
+#include <ndn-cxx/name.hpp>
 
 namespace ndn {
 namespace ndns {
@@ -32,26 +33,34 @@ class Zone
 
 public:
 
-  Zone(const Name& name);
-  Zone();
-  virtual ~Zone();
+  Zone (const Name& name);
+  Zone (const std::string name);
+  Zone (const char* name);
 
-  const Name& getAuthorizedName() const
+  Zone ();
+  virtual
+  ~Zone ();
+
+  const Name&
+  getAuthorizedName () const
   {
     return m_authorizedName;
   }
 
-  void setAuthorizedName(const Name& authorizedName)
+  void
+  setAuthorizedName (const Name& authorizedName)
   {
     m_authorizedName = authorizedName;
   }
 
-  uint32_t getId() const
+  uint32_t
+  getId () const
   {
     return m_id;
   }
 
-  void setId(uint32_t id)
+  void
+  setId (uint32_t id)
   {
     m_id = id;
   }
@@ -62,7 +71,14 @@ private:
 };
 //class Zone
 
-}// namespace ndns
+inline std::ostream&
+operator<< (std::ostream& os, const Zone& zone)
+{
+  os << "Zone: Id=" << zone.getId () << " Name=" << zone.getAuthorizedName ().toUri ();
+  return os;
+}
+
+} // namespace ndns
 } // namespace ndn
 
-#endif // NDNS_ZONE_HPP
+#endif

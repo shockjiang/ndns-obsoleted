@@ -17,53 +17,49 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../boost-test.hpp"
+#ifndef NDNS_SERVICE_DYNDNS_MGR_HPP
+#define NDNS_SERVICE_DYNDNS_MGR_HPP
 
+#include "zone.hpp"
+#include "query.hpp"
+#include "response.hpp"
+#include "rr.hpp"
+#include "db/db-mgr.hpp"
+#include "query-update.hpp"
+#include "db/rrset-mgr.hpp"
 #include "db/rr-mgr.hpp"
 
-//#include <ndn-cxx/name.hpp>
 namespace ndn {
 namespace ndns {
-namespace tests {
 
-using namespace std;
-
-BOOST_AUTO_TEST_SUITE(rrMgr)
-
-BOOST_AUTO_TEST_CASE(db)
+class DyndnsMgr : public DBMgr
 {
+public:
+  DyndnsMgr (Zone& zone, Response& re, QueryUpdate& queryUpdate);
 
-  string label = "rrMgr::db";
-  printbegin(label);
+  virtual
+  ~DyndnsMgr ();
 
-  ndns::Query q;
-  Name n1("/net");
-  Name n2("/ndnsim");
-  q.setAuthorityZone(n1);
-  q.setRrLabel(n2);
-  q.setQueryType(ndns::Query::QUERY_DNS_R);
+  int
+  update ();
+  int
+  callback_update (int argc, char **argv, char **azColName);
 
+  static int
+  static_callback_update (void *param, int argc, char ** argv, char **azColName)
+  {
 
-  Zone zone;
-  zone.setAuthorizedName(Name("/net"));
-  zone.setId(2);
-
-  Response re;
-
-  RRMgr mgr(zone, q, re);
-  BOOST_CHECK_EQUAL(mgr.lookup(), 0);
+    return 0;
+  }
 
 
-  zone.setId(23);
-  RRMgr mgr2(zone, q, re);
-  BOOST_CHECK_EQUAL(mgr2.lookup(), 0);
+  Zone& m_zone;
+  Response& m_response;
+  QueryUpdate& m_queryUpdate;
 
+};
 
+} /* namespace ndns */
+} /* namespace ndn */
 
-  printend(label);
-}
-BOOST_AUTO_TEST_SUITE_END()
-
-} // namespace tests
-} // namespace ndns
-} // namespace ndn
+#endif

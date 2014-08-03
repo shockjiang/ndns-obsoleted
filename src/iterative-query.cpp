@@ -22,120 +22,138 @@
 namespace ndn {
 namespace ndns {
 
-IterativeQuery::IterativeQuery(const Query& query)
-  : m_step(IterativeQuery::NSQuery)
-  , m_tryNum(0)
-  , m_tryMax(2)
-  , m_query(query)
-  , m_finishedLabelNum(0)
-  , m_lastFinishedLabelNum(0)
-  , m_rrLabelLen(1)
-  , m_authZoneIndex(0)
+IterativeQuery::IterativeQuery (const Query& query)
+  : m_step (QUERY_STEP_NSQuery)
+  , m_tryNum (0)
+  , m_tryMax (2)
+  , m_query (query)
+  , m_finishedLabelNum (0)
+  , m_lastFinishedLabelNum (0)
+  , m_rrLabelLen (1)
+  , m_authZoneIndex (0)
 {
 }
 
-bool IterativeQuery::doTimeout()
+IterativeQuery::~IterativeQuery ()
 {
-  abort();
+}
+
+bool
+IterativeQuery::doTimeout ()
+{
+  abort ();
   return false;
 }
 
-void IterativeQuery::abort()
- {
-  std::cout<<"Abort the Resolving"<<std::endl;
-   std::cout << (*this);
-   std::cout << std::endl;
- }
-
-void IterativeQuery::doData(Data& data)
+void
+IterativeQuery::abort ()
 {
-  std::cout << "[* -> *] resolve Data: " << data.getName().toUri() << std::endl;
+  std::cout << "QUERY_STEP_Abort the Resolving" << std::endl;
+  std::cout << (*this);
+  std::cout << std::endl;
+}
+
+void
+IterativeQuery::doData (Data& data)
+{
+  std::cout << "[* -> *] resolve Data: " << data.getName ().toUri () << std::endl;
   Response re;
-  re.fromData(data);
+  re.fromData (data);
   std::cout << re << std::endl;
 
-  if (re.getResponseType() == Response::UNKNOWN) {
+  if (re.getResponseType () == RESPONSE_UNKNOWN) {
     std::cout << "[* !! *] unknown content type and exit";
-    m_step = Abort;
-    abort();
+    m_step = QUERY_STEP_Abort;
+    abort ();
     return;
-  } else if (re.getResponseType() == Response::NDNS_Nack) {
-    if (m_step == NSQuery) {
+  }
+  else if (re.getResponseType () == RESPONSE_NDNS_Nack) {
+    if (m_step == QUERY_STEP_NSQuery) {
       //In fact, there are two different situations
       //1st: /net/ndnsim/DNS/www/NS is nacked
       //2st: /net/DNS/ndnsim/www/NS is nacked
-      m_step = RRQuery;
+      m_step = QUERY_STEP_RRQuery;
 
-      if (m_query.getRrType() == RR::NDNCERT && m_rrLabelLen == 1) {
-        //here working for KSK and NDNCERT when get a Nack
+      if (m_query.getRrType () == RR_ID_CERT && m_rrLabelLen == 1) {
+        //here working for KSK and ID-CERT when get a Nack
         //e.g., /net/ndnsim/ksk-1, ksk-1 returns nack, but it should query /net
 
-        Name dstLabel = m_query.getRrLabel();
-        Name label = dstLabel.getSubName(m_finishedLabelNum, m_rrLabelLen);
-        if (boost::starts_with(label.toUri(), "/ksk") || boost::starts_with(label.toUri(), "/KSK")) {
+        Name dstLabel = m_query.getRrLabel ();
+        Name label = dstLabel.getSubName (m_finishedLabelNum, m_rrLabelLen);
+        if (boost::starts_with (label.toUri (), "/ksk")
+          || boost::starts_with (label.toUri (), "/KSK")) {
           m_finishedLabelNum = m_lastFinishedLabelNum;
         }
 
       }
-    } else if (m_step == RRQuery) {
-      m_step = AnswerStub;
+    }
+    else if (m_step == QUERY_STEP_RRQuery) {
+      m_step = QUERY_STEP_AnswerStub;
     }
 
     m_lastResponse = re;
-  } else if (re.getResponseType() == Response::NDNS_Auth) { // need more specific info
+  }
+  else if (re.getResponseType () == RESPONSE_NDNS_Auth) { // need more specific info
     m_rrLabelLen += 1;
-  } else if (re.getResponseType() == Response::NDNS_Resp) { // get the intermediate answer
-    if (m_step == NSQuery) {
-      //do nothing, step NSQuery
+  }
+  else if (re.getResponseType () == RESPONSE_NDNS_Resp) { // get the intermediate answer
+    if (m_step == QUERY_STEP_NSQuery) {
+      //do nothing, step QUERY_STEP_NSQuery
       m_lastFinishedLabelNum = m_finishedLabelNum;
       m_finishedLabelNum += m_rrLabelLen;
       m_rrLabelLen = 1;
       m_authZoneIndex = 0;
       m_lastResponse = re;
 
-    } else if (m_step == RRQuery) { // final resolver gets result back
-      m_step = AnswerStub;
+    }
+    else if (m_step == QUERY_STEP_RRQuery) { // final resolver gets result back
+      m_step = QUERY_STEP_AnswerStub;
       m_lastResponse = re;
     }
 
-    std::cout << "get RRs: " << m_lastResponse.getStringRRs() << std::endl;
+    std::cout << "get RRs: " << m_lastResponse.getStringRRs () << std::endl;
   }
 
 }
 
-const Interest IterativeQuery::toLatestInterest()
+const Interest
+IterativeQuery::toLatestInterest ()
 {
-  Query query = Query();
-  Name dstLabel = m_query.getRrLabel();
+  Query query = Query ();
+  Name dstLabel = m_query.getRrLabel ();
 
-  Name authZone = dstLabel.getPrefix(m_finishedLabelNum);
+  Name authZone = dstLabel.getPrefix (m_finishedLabelNum);
 
   Name label;
-  if (m_step == RRQuery) {
-    label = dstLabel.getSubName(m_finishedLabelNum);
-  } else {
-    label = dstLabel.getSubName(m_finishedLabelNum, m_rrLabelLen);
+  if (m_step == QUERY_STEP_RRQuery) {
+    label = dstLabel.getSubName (m_finishedLabelNum);
   }
-  query.setAuthorityZone(authZone);
-  query.setRrLabel(label);
+  else {
+    label = dstLabel.getSubName (m_finishedLabelNum, m_rrLabelLen);
+  }
+  query.setAuthorityZone (authZone);
+  query.setRrLabel (label);
 
-  if (m_step == NSQuery) {
-    query.setRrType(RR::NS);
-    query.setQueryType(Query::QUERY_DNS);
-  } else if (m_step == RRQuery) {
-    query.setRrType(m_query.getRrType());
-    if (m_query.getRrType() == RR::NDNCERT) {
-      query.setQueryType(Query::QUERY_KEY);
-      query.setQueryType(Query::QUERY_DNS);
-    } else {
-      query.setQueryType(Query::QUERY_DNS);
+  if (m_step == QUERY_STEP_NSQuery) {
+    query.setRrType (RR_NS);
+    query.setQueryType (QUERY_DNS);
+  }
+  else if (m_step == QUERY_STEP_RRQuery) {
+    query.setRrType (m_query.getRrType ());
+    if (m_query.getRrType () == RR_ID_CERT) {
+      query.setQueryType (QUERY_KEY);
+      query.setQueryType (QUERY_DNS);
+    }
+    else {
+      query.setQueryType (QUERY_DNS);
     }
 
-  } else if (m_step == AnswerStub) {
-    query.setRrType(m_query.getRrType());
-    query.setQueryType(Query::QUERY_DNS);
   }
-  Interest interest = query.toInterest();
+  else if (m_step == QUERY_STEP_AnswerStub) {
+    query.setRrType (m_query.getRrType ());
+    query.setQueryType (QUERY_DNS);
+  }
+  Interest interest = query.toInterest ();
   //m_lastInterest = interest;
 
   return interest;

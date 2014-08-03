@@ -17,7 +17,6 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /**
  * Copyright (c) 2014, Regents of the University of California.
@@ -38,6 +37,7 @@
  */
 
 #include "app/name-caching-resolver.hpp"
+#include "iterative-query-with-forwarding-hint.hpp"
 #include "../boost-test.hpp"
 
 //#include <boost/test/test_tools.hpp>
@@ -54,24 +54,23 @@ BOOST_AUTO_TEST_SUITE(nameCachingResolver)
 BOOST_AUTO_TEST_CASE(Protocol)
 {
   string label = "nameCachingResolver::Protocol";
-  printbegin(label);
+  printbegin (label);
 
   Name name = "/DNS-R/net/ndnsim/www/TXT";
   Interest interest;
-  interest.setName(name);
+  interest.setName (name);
 
-  NameCachingResolver resolver("resolver", "/DNS-R");
-  cout<<"onInterest"<<endl;
-  resolver.onInterest(name, interest);
-
-
-
-  printend(label);
+  NameCachingResolver<IterativeQueryWithForwardingHint> resolver ("resolver", "/DNS-R");
+  cout << "onInterest" << endl;
+  //keepResolver must be set to false, or it will try to send Interest without building a face previously
+  resolver.onInterest (name, interest, false);
+  cout << "after onInterest" << endl;
+  printend (label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace ndns
+}// namespace tests
+}// namespace ndns
 } // namespace ndn
 

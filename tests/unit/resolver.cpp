@@ -18,7 +18,6 @@
  */
 
 // #include "resolver.h"
-
 namespace ndn {
 namespace ndns {
 namespace tests {

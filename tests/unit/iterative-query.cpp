@@ -34,17 +34,15 @@ BOOST_AUTO_TEST_SUITE(iQuery)
 BOOST_AUTO_TEST_CASE(Protocol)
 {
   string label = "iQuery::Protocol";
-  printbegin(label);
+  printbegin (label);
 
   Query q;
 
-
-
-  printend(label);
+  printend (label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace ndns
+}// namespace tests
+}// namespace ndns
 } // namespace ndn

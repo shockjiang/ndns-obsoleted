@@ -18,18 +18,18 @@ namespace ndn {
 namespace ndns {
 namespace tests {
 
-  void inline
-  printbegin(std::string label)
-  {
-    std::cout<<std::endl<<"-->>>>>>>>>>>>>>"<<label<<" begins:"<<std::endl;
-  }
+void inline
+printbegin (std::string label)
+{
+  std::cout << std::endl << "-->>>>>>>>>>>>>>" << label << " begins:" << std::endl;
+}
 
-  void inline
-  printend(std::string label)
-  {
-    std::cout<<"<<<<<<<<<<<<<<--"<<label<<" ends."<<std::endl;
-  }
-}//tests
-}//ndns
-}//ndn
+void inline
+printend (std::string label)
+{
+  std::cout << "<<<<<<<<<<<<<<--" << label << " ends." << std::endl;
+}
+} //tests
+} //ndns
+} //ndn
 #endif // NDN_TESTS_BOOST_TEST_HPP
