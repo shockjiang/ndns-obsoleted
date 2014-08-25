@@ -16,7 +16,8 @@ def options(opt):
 
     ropt.add_option('--with-tests', action='store_true', default=False, dest='with_tests',
                     help='''build unit tests''')
-
+    ropt.add_option('--with-tools', action='store_true', default=False, dest='with_tools',
+                    help='''build tool apps''')
 def configure(conf):
     conf.load(['compiler_cxx', 'gnu_dirs',
                'boost', 'default-compiler-flags', 'doxygen', 'sphinx_build',
@@ -32,7 +33,10 @@ def configure(conf):
 
     if conf.options.with_tests:
         conf.env['WITH_TESTS'] = True
-
+    
+    if conf.options.with_tools:
+        conf.env['WITH_TOOLS'] = True
+  
     USED_BOOST_LIBS = ['system']
     if conf.env['WITH_TESTS']:
         USED_BOOST_LIBS += ['unit_test_framework']
@@ -70,65 +74,19 @@ def build (bld):
         includes='src',
         export_includes='src',
     )
-"""
-    for app in bld.path.ant_glob('tools/*.cpp'):
-        bld(features=['cxx', 'cxxprogram'],
-            target='bin/%s' % (str(app.change_ext(''))),
-            source=['tools/%s' % (str(app))],
-            use='ndns-objects',
-            )
-"""
     
-    bld(
-      features='cxx cxxprogram',
-      source = "tools/name-server-daemon.cpp",
-      target = "name-server-daemon",
-      use = "ndns-objects"
-    )
-    
-    bld(
-      features='cxx cxxprogram',
-      source = "tools/caching-resolver-daemon.cpp",
-      target = "caching-resolver-daemon",
-      use = "ndns-objects"
-    )
-    
-    bld(
-      features='cxx cxxprogram',
-      source = "tools/dig.cpp",
-      target = "dig",
-      use = "ndns-objects"
-    )
-    
-    bld(
-      features='cxx cxxprogram',
-      source = "tools/zone-build.cpp",
-      target = "zone-build",
-      use = "ndns-objects",
-    )
-    
-    bld(
-      features='cxx cxxprogram',
-      source = "tools/zone-register-root.cpp",
-      target = "zone-register-root",
-      use = "ndns-objects",
-    )
-    
-    bld(
-      features='cxx cxxprogram',
-      source = "tools/zone-register.cpp",
-      target = "zone-register",
-      use = "ndns-objects",
-    )
-    
-    
-    
-    
-    
-    
->>>>>>> 16f5f40... optimization
-    bld.recurse('tests')
 
+#    for app in bld.path.ant_glob('tools/*.cpp'):
+#        bld(features=['cxx', 'cxxprogram'],
+#            target='bin/%s' % (str(app.change_ext(''))),
+#            source=['tools/%s' % (str(app))],
+#            use='ndns-objects',
+#            )
+ 
+    
+    bld.recurse('tests')
+  
+    bld.recurse('tools')
     # bld.install_files('${SYSCONFDIR}/ndn', 'ndns.conf.sample')
 
 def docs(bld):

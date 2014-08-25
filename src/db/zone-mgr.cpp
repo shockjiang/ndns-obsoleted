@@ -66,24 +66,27 @@ ZoneMgr::lookupId ()
   lookupId (this->m_zone.getAuthorizedName ());
 }
 
-} //namepsace ndns
-} //namespace ndn
 
 void
-ndn::ndns::ZoneMgr::insert ()
+ZoneMgr::insert ()
 {
   this->open ();
   std::string sql = "INSERT INTO zones (name) VALUES (\'";
   sql += m_zone.getAuthorizedName ().toUri () + "\')";
-  this->executeOnly (sql, static_callback_insert, this);
+  this->executeOnly (sql, this->static_callback_doNothing, this);
   m_zone.setId (sqlite3_last_insert_rowid (this->m_conn));
   //std::cout<<"zone info: "<<m_zone<<std::endl;
   this->close ();
 }
 
-int
-ndn::ndns::ZoneMgr::callback_insert (int argc, char** argv, char** azColName)
-{
-  std::cout << "insert a zone: " << m_zone << std::endl;
-  return 0;
-}
+//
+//int
+//ZoneMgr::callback_insert (int argc, char** argv, char** azColName)
+//{
+//  std::cout << "insert a zone: " << m_zone << std::endl;
+//  return 0;
+//}
+
+} //namepsace ndns
+} //namespace ndn
+

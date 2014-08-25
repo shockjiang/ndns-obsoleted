@@ -31,14 +31,16 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(response)
+BOOST_AUTO_TEST_SUITE(Response)
 
 BOOST_AUTO_TEST_CASE(Encode)
 {
 
   printbegin ("response:Encode");
 
-  Response re, re2;
+
+
+  ndns::Response re, re2;
   cout << "construct a Response Instance" << endl;
   vector<RR> vec;
 
@@ -49,18 +51,21 @@ BOOST_AUTO_TEST_CASE(Encode)
   zone2.setId (2);
 
   RRSet rrset1 (zone);
-  RRSet rrset2 (zone2);
-
+  rrset1.setLabel(zone2.getAuthorizedName());
   RR rr (rrset1);
 
-  std::string ex3 = "www3.ex.com";
+  std::string ex3 = "www3.ex.net";
   uint32_t id = 203;
   rr.setRrData (ex3);
   rr.setId (id);
   vec.push_back (rr);
 
-  RR rr2 (rrset2);
 
+
+  RRSet rrset2 (zone);
+  rrset2.setLabel(Name("/net")); //RR in response must share the same RRLabel
+
+  RR rr2 (rrset2);
   std::string ex4 = "www4.ex.com";
   id = 204;
   rr2.setRrData (ex4);
@@ -75,7 +80,7 @@ BOOST_AUTO_TEST_CASE(Encode)
   q.setQueryType (QUERY_DNS_R);
   Interest interest = q.toInterest ();
   Name n3 (q.toInterest ().getName ());
-  n3.appendNumber ((uint64_t) 1313344);
+  n3.appendVersion();
 
   re.setQueryName (n3);
   re.setFreshness (time::milliseconds (4444));
@@ -94,8 +99,9 @@ BOOST_AUTO_TEST_CASE(Encode)
   BOOST_CHECK_EQUAL(re.getQueryType (), re2.getQueryType ());
   BOOST_CHECK_EQUAL(re.getResponseType (), re2.getResponseType ());
   BOOST_CHECK_EQUAL(re.getRrs ().size (), re2.getRrs ().size ());
-  BOOST_CHECK_EQUAL(re.getRrs ()[0], re2.getRrs ()[0]);
-  BOOST_CHECK_EQUAL(re.getRrs ()[1], re2.getRrs ()[1]);
+  BOOST_CHECK_EQUAL(re.getStringRRs(), re2.getStringRRs());
+  //RR: Id=203 Data=www3.ex.ne... [RRSet=RRSet: Id=0 Zone=/ Label=/net Type=NS Class=] UpdateAction=NONE RR: Id=204 Data=www4.ex.co... [RRSet=RRSet: Id=0 Zone=/ Label=/com Type=NS Class=] UpdateAction=NONE]
+  //RR: Id=203 Data=www3.ex.ne... [RRSet=RRSet: Id=0 Zone=/ Label=/net Type=NS Class=] UpdateAction=NONE RR: Id=204 Data=www4.ex.co... [RRSet=RRSet: Id=0 Zone=/ Label=/net Type=NS Class=] UpdateAction=NONE]]
 
   printend ("response:Encode");
 }

@@ -49,6 +49,7 @@ RRMgr::lookupIds()
       sql = "SELECT id FROM rrs WHERE rrset_id=";
       sql += std::to_string(rr.getRrset().getId());
       sql += " AND rrdata=\'" + rr.getRrData() + "\'";
+      this->setTempInt(0);
       this->executeOnly(sql, static_callback_getInt, this);
     rr.setId(this->m_tempInt);
     }
@@ -71,7 +72,6 @@ RRMgr::replace_all()
 }
 
 
-
 void
 RRMgr::insert ()
 {
@@ -88,9 +88,9 @@ RRMgr::insert ()
     sql += "\'" + rr.getRrData () + "\'";
     sql += ")";
 
-    this->executeOnly (sql, static_callback_getInt, this);
-    rr.setId(this->m_tempInt);
+    this->executeOnly (sql, this->static_callback_insert_id, this);
 
+    rr.setId(sqlite3_last_insert_rowid (this->m_conn));
 
     iter++;
   }

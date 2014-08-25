@@ -48,6 +48,7 @@ QueryMgr::hasAuth ()
   sql += "rrsets.label LIKE\'";
   sql += m_query.getRrLabel ().toUri () + "/%\'";
 
+  this->setTempInt(0);
   this->execute (sql, static_callback_getInt, this);
 
   return this->m_tempInt;

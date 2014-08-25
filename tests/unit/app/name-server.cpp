@@ -49,7 +49,7 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(nameServer)
+BOOST_AUTO_TEST_SUITE(AppNameServer)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {

@@ -38,47 +38,6 @@ QueryUpdate::toInterest (KeyChain& keyChain)
   keyChain.sign (data);
   m_wiredUpdate = data.wireEncode();
 
-
-  /*
-  Block block = data.wireEncode ();
-
-  Name rrLabel = Name(block);
-
-  this->m_rrLabel=rrLabel;
-
-
-
-
-  std::string str = this->m_rrLabel.toUri();
-  std::cout << "the str=" << str << std::endl;
-  Name name(str);
-
-  Block b2 = name.wireEncode();
-
-  Block b3 = rrLabel.wireEncode();
-  b3.resetWire();
-  Response re2;
-
-  if (rrLabel == name) {
-    std::cout << rrLabel.at(0).toUri() << " = " << name.at(0).toUri()<<std::endl;
-    std::cout << name.hasWire() << " = " << rrLabel.hasWire();
-  }
-  else {
-    std::cout<<b2.size()<< " != "<< b3.size() <<std::endl;
-
-  }
-
-
-
-  Data d2;
-  d2.wireDecode(b3);
-  std::cout<<"=======";
-
-  re2.fromData(d2);
-  std::cout << "re2=" << re2 << std::endl;
-  */
-
-
   Name name;
   if (m_forwardingHint.empty()) {
     //std::cout<<"do not add forwarding---------------------------:"<<std::endl;

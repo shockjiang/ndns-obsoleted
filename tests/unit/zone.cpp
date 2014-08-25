@@ -17,10 +17,26 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// #include "src/zone.h"
+#include "zone.hpp"
+#include "boost-test.hpp"
+
 namespace ndn {
 namespace ndns {
 namespace tests {
+
+using namespace std;
+
+BOOST_AUTO_TEST_SUITE(Zone)
+
+BOOST_AUTO_TEST_CASE(Encode)
+{
+  string label = "zone:Encode";
+  printbegin (label);
+
+  printend (label);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace tests
 } // namespace ndns

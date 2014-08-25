@@ -50,8 +50,9 @@ RRSetMgr::insert ()
     sql += "NULL";
     sql += ")";
 
-    this->executeOnly (sql, static_callback_getInt, this);
-    rrset.setId(this->getTempInt());
+
+    this->executeOnly (sql, static_callback_doNothing, this);
+    rrset.setId(sqlite3_last_insert_rowid (this->m_conn));
     //std::cout<<"just insert: "<<rrset<<std::endl;
 
     iter++;
@@ -67,6 +68,7 @@ RRSetMgr::lookupIds ()
 {
   std::string sql;
   std::vector<RRSet*>::iterator iter = m_rrsets.begin ();
+  this->open();
   while (iter != m_rrsets.end ()) {
     RRSet& rrset = **iter;
     sql = "SELECT id FROM rrsets WHERE zone_id=";
@@ -74,11 +76,14 @@ RRSetMgr::lookupIds ()
     sql += " AND label=\'" + rrset.getLabel ().toUri() + "\'";
     sql += " AND type=\'" + toString (rrset.getType ()) + "\'";
 
+    this->setTempInt(0);
     this->executeOnly (sql, this->static_callback_getInt, this);
     rrset.setId (this->getTempInt ());
 
     iter++;
   }
+
+  this->close();
 }
 
 

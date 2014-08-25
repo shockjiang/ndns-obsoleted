@@ -46,19 +46,46 @@ NameServer::onInterest (const Name &name, const Interest &interest)
     queryUpdate.fromInterest(interest);
     queryUpdate.setUpdateZone(m_zone);
     DyndnsMgr mgr(m_zone, re, queryUpdate);
-    mgr.update();
+
+    re.setQueryName(interest.getName());
+    re.setResponseType(RESPONSE_DyNDNS_OK);
+    re.setFreshness(this->m_contentFreshness);
+
+    std::string msg = "OK";
+    try {
+      mgr.update();
+    }
+    catch (std::exception& e) {
+      //basically, it handles the runtime_error shrowed by executeOnly (in db-mgr.cpp)
+      std::cout << e.what() << std::endl;
+      re.setResponseType(RESPONSE_DyNDNS_FAIL);
+      msg = e.what();
+    }
+
+    const std::vector<RR>& rrs = queryUpdate.getUpdate().getRrs();
+    const RR& rr = rrs[0];
+    if (rr.getId() == 0) {
+      re.setResponseType(RESPONSE_DyNDNS_FAIL);
+      msg = "Unknown Reason";
+    }
+
+
+    Data data = re.toData();
+    data.setFreshnessPeriod (re.getFreshness ());
+    data.setContent(reinterpret_cast<const uint8_t*>(msg.c_str()), msg.size());
+    m_keyChain.sign (data);
+    m_face.put (data);
+    cout << "[* <- *] send response: " << re << ": " << data << endl;
 
     /*
-     *
      * check the update agains? NDNs security policy
-     *
      */
 
     /*
-     *
      * check the seq
-     *
      */
+
+
   }
   else if (std::regex_match(nameStr, results, ndn::ndns::label::QUERY_NAME_REGEX)) {
     Query query;

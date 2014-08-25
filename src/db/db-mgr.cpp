@@ -101,7 +101,9 @@ DBMgr::executeOnly (std::string sql, int
   }
 
   this->printSQL (sql);
-  clearResultNum ();
+  //this->setTempInt(0);
+  //this->clearResultNum ();
+
   char *err_msg;
   //std::cout<<"to execute"<<std::endl;
   m_reCode = sqlite3_exec (m_conn, sql.c_str (), callback, paras, &err_msg);
@@ -109,8 +111,13 @@ DBMgr::executeOnly (std::string sql, int
   //std::cout<<"finish execute. reCode="<<m_reCode<<" SQLITE_OK="<<SQLITE_OK<<std::endl;
   if (m_reCode != SQLITE_OK) {
     m_status = DBError;
-    this->m_err.append (err_msg);
+
+    std::string msg = "execute SQL=["+sql +"] and returns error:" +err_msg;
+    this->m_err = msg;
+
     std::cout << "DBError: " << this->m_err << std::endl;
+
+     throw std::runtime_error(msg);
   }
 }
 
@@ -168,7 +175,9 @@ DBMgr::executeOnly (std::vector<std::string> sqls, int
 int
 DBMgr::callback_getInt (int argc, char **argv, char** azColNames)
 {
+
   this->m_tempInt = std::atoi (argv[0]);
+  std::cout << "return Int =" << this->m_tempInt << std::endl;
   return 0;
 }
 int
@@ -182,6 +191,7 @@ int
 DBMgr::callback_get_insert_id (int argc, char **argv, char** azColNames)
 {
   this->m_tempInt = std::atoi (argv[0]);
+  std::cout << "return insert Id =" << this->m_tempInt;
   return 0;
 }
 

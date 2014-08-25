@@ -29,7 +29,7 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(zoneMgr)
+BOOST_AUTO_TEST_SUITE(DbZoneMgr)
 
 BOOST_AUTO_TEST_CASE(db)
 {

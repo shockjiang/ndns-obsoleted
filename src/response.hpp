@@ -31,10 +31,6 @@
 
 #include <ndn-cxx/encoding/block-helpers.hpp>
 #include <ndn-cxx/encoding/block.hpp>
-<<<<<<< HEAD
-=======
-//#include <ndn-cxx/encoding/tlv-ndnd.hpp>
->>>>>>> 16f5f40... optimization
 
 #include <vector>
 
@@ -177,6 +173,11 @@ private:
   enum RRType m_rrType;
 
   ResponseType m_responseType;
+
+  /**
+   * @brief RRs in response must share the same RRLabel and must be the same
+   * with the RRlabel derived from the name
+   */
   std::vector<RR> m_rrs;
   mutable Block m_wire;
 

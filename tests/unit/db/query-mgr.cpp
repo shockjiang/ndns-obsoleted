@@ -30,7 +30,7 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(rrMgr)
+BOOST_AUTO_TEST_SUITE(DbQueryMgr)
 
 BOOST_AUTO_TEST_CASE(db)
 {

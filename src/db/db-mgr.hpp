@@ -24,6 +24,7 @@
 #include <iostream>
 //#include <boost/algorithm/string.hpp>
 #include <vector>
+#include <stdexcept>
 
 namespace ndn {
 namespace ndns {
@@ -121,6 +122,9 @@ public:
           + sql.substr (sql.size () - 5, sql.size ())
         << std::endl;
       ;
+    }
+    else {
+      std::cout << "SQL=" << sql << std::endl;
     }
   }
 

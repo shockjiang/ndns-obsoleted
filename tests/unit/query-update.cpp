@@ -27,7 +27,7 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(qu)
+BOOST_AUTO_TEST_SUITE(QueryUpdate)
 
 BOOST_AUTO_TEST_CASE(UnderstandInterest)
 {

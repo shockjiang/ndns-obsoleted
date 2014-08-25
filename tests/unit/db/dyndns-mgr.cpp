@@ -27,7 +27,7 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(dyndnsMgr)
+BOOST_AUTO_TEST_SUITE(DbDyndnsMgr)
 
 BOOST_AUTO_TEST_CASE(update)
 {
@@ -35,13 +35,13 @@ BOOST_AUTO_TEST_CASE(update)
   string label = "dyndnsMgr::update";
   printbegin (label);
 
-  Zone zone (Name ("/com/skype"));
+  Zone zone (Name ("/net"));
 
-  zone.setId (7UL);
+  zone.setId (1UL);
 
   //DynamicDNSUpdate update("update", "/com/skype", zone, Name("/shock"), RR::FH, "/t-mobile2", ndn::ndns::label::UpdateAdd);
   //DynamicDNSUpdate update("update", "/com/skype", zone, Name("/shock"), RR::FH, "/t-mobile", "/t-mobile2");
-  DynamicDNSUpdate update ("update", "/com/skype", zone, Name ("/shock"), RR_FH, "/t-mobile2",
+  DynamicDNSUpdate update ("update", "/net/skype", zone, Name ("/shock"), RR_FH, "/t-mobile2",
                            ndn::ndns::UPDATE_ACTION_ADD);
 
   Interest interest = update.toInterest ();
@@ -54,6 +54,10 @@ BOOST_AUTO_TEST_CASE(update)
   DyndnsMgr mgr (zone, re, queryUpdate);
 
   mgr.update ();
+  const std::vector<RR>& rrs = queryUpdate.getUpdate().getRrs();
+  const RR& rr = rrs[0];
+  std::cout << rr <<std::endl;
+  BOOST_CHECK_GT(rr.getId(), 0);
 
   printend (label);
 }

@@ -49,6 +49,13 @@ public:
   bool
   fromInterest (const Interest& interest);
 
+
+  void
+  setUpdateRrs(const std::vector<RR>& rrs)
+  {
+    m_update.setRrs(rrs);
+  }
+
   const Response&
   getUpdate () const
   {

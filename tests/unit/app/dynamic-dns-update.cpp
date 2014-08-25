@@ -49,7 +49,7 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(dyndns)
+BOOST_AUTO_TEST_SUITE(AppDynamicDnsUpdate)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {

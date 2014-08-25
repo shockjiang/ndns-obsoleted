@@ -1,0 +1,53 @@
+# -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+from waflib import Utils
+
+top = '..'
+
+def build(bld):
+    if bld.env['WITH_TOOLS']:
+        bld(
+            features='cxx cxxprogram',
+            source = "name-server-daemon.cpp",
+            target = "name-server-daemon",
+            use = "ndns-objects"
+        )
+        
+        bld(
+            features='cxx cxxprogram',
+            source = "caching-resolver-daemon.cpp",
+            target = "caching-resolver-daemon",
+            use = "ndns-objects"
+        )
+        
+        bld(
+            features='cxx cxxprogram',
+            source = "dig.cpp",
+            target = "dig",
+            use = "ndns-objects"
+        )
+        
+        bld(
+            features='cxx cxxprogram',
+            source = "zone-build.cpp",
+            target = "zone-build",
+            use = "ndns-objects",
+        )
+        
+        bld(
+            features='cxx cxxprogram',
+            source = "zone-register-root.cpp",
+            target = "zone-register-root",
+            use = "ndns-objects",
+        )
+        
+        bld(
+            features='cxx cxxprogram',
+            source = "zone-register.cpp",
+            target = "zone-register",
+            use = "ndns-objects",
+        )
+        
+        
+    
+    

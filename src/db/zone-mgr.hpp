@@ -56,16 +56,16 @@ public:
   void
   insert ();
 
-  int
-  callback_insert (int argc, char **argv, char **azColName);
+//  int
+//  callback_insert (int argc, char **argv, char **azColName);
 
-  static int
-  static_callback_insert (void *param, int argc, char **argv, char **azColName)
-  {
-
-    ZoneMgr *mgr = reinterpret_cast<ZoneMgr*> (param);
-    return mgr->callback_insert (argc, argv, azColName);
-  }
+//  static int
+//  static_callback_insert (void *param, int argc, char **argv, char **azColName)
+//  {
+//
+//    ZoneMgr *mgr = reinterpret_cast<ZoneMgr*> (param);
+//    return mgr->callback_insert (argc, argv, azColName);
+//  }
 
   const Zone&
   getZone () const

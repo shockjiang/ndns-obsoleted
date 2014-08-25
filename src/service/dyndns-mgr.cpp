@@ -33,31 +33,40 @@ DyndnsMgr::~DyndnsMgr ()
 {
 }
 
-int
-DyndnsMgr::update ()
+void
+DyndnsMgr::update () throw()
 {
-  const std::vector<RR> rrs = m_queryUpdate.getUpdate().getRrs();
+  std::vector<RR> rrs = m_queryUpdate.getUpdate().getRrs();
 
 
-  RR rr = rrs[0];
+  RR& rr = rrs[0];
+  rr.setZone(m_zone);
   std::string sql;
   RRSet rrset = rr.getRrset();
+  std::cout << rrset << std::endl;
   RRSetMgr rrsetMgr;
   rrsetMgr.addRRSet(rrset);
+
   rrsetMgr.lookupIds();
 
+  std::cout <<"rrset= " << rrset << std::endl;
   rr.setRrset(rrset);
   RRMgr rrMgr;
   rrMgr.addRR(rr);
   rrMgr.lookupIds();
 
+  //std::cout << "rr= " <<rr <<std::endl;
   if (rr.getUpdateAction() == UPDATE_ACTION_NONE) {
     std::cout << "None action" << std::endl;
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_ADD) {
-    if (rr.getId() == 0) {
+    if (rr.getId() != 0) {
+      ;// already there, no more ADD
+    }
+    else {
       if (rrset.getId() == 0)
         rrsetMgr.insert();
+
       rrMgr.insert();
     }
   }
@@ -76,14 +85,16 @@ DyndnsMgr::update ()
     rrMgr.insert();
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_REPLACE) {
-    // not supported yet
+    throw std::runtime_error("Not support "+toString(rr.getUpdateAction()));
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_UNKNOWN) {
-    // should not be this way
+    throw std::runtime_error("Not support "+toString(rr.getUpdateAction()));
   }
 
 
-  return 0;
+  std::cout <<rr <<std::endl;
+  m_queryUpdate.setUpdateRrs(rrs);
+
 
 }
 

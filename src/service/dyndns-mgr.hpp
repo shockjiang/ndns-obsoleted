@@ -20,6 +20,8 @@
 #ifndef NDNS_SERVICE_DYNDNS_MGR_HPP
 #define NDNS_SERVICE_DYNDNS_MGR_HPP
 
+#include <stdexcept>
+
 #include "zone.hpp"
 #include "query.hpp"
 #include "response.hpp"
@@ -40,8 +42,9 @@ public:
   virtual
   ~DyndnsMgr ();
 
-  int
-  update ();
+  void
+  update () throw();
+
   int
   callback_update (int argc, char **argv, char **azColName);
 
