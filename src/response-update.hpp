@@ -17,34 +17,71 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NDNS_NDNS_TLV_HPP
-#define NDNS_NDNS_TLV_HPP
+#ifndef RESPONSE_UPDATE_HPP_
+#define RESPONSE_UPDATE_HPP_
+
+#include "response.hpp"
+
 namespace ndn {
 namespace ndns {
-namespace tlv {
 
-enum
+/*
+ *
+ */
+class ResponseUpdate : public Response
 {
-  ResponseType = 130,
-  ResponseFressness = 131,
-  ResponseContentBlob = 132,
-  ResponseNumberOfRRData = 133,
-  RRData = 134,
+public:
+  ResponseUpdate ();
+  virtual
+  ~ResponseUpdate ();
 
+  const Block&
+  wireEncode () const;
 
-  RRDataSub1 = 141,
-  RRDataRecord = 142,
-  RRUpdateAction = 143,
-  UpdateResult = 144,
-  RRZone = 145,
+  void
+  wireDecode (const Block& wire);
 
-  NDNSRecusive = 151,
-  NDNSInteative = 152
+  template<bool T>
+  size_t
+  wireEncode (EncodingImpl<T> & block) const;
 
+  void
+  fromData (const Name& name, const Data& data);
+
+  void
+  fromData (const Data &data);
+
+  Data
+  toData () const;
+
+  const std::string&
+  getResult () const
+  {
+    return m_result;
+  }
+
+  void
+  setResult (const std::string& result)
+  {
+    m_result = result;
+  }
+
+private:
+  std::string m_result;
 };
 
-} // namespace tlv
+
+inline std::ostream&
+operator<< (std::ostream& os, const ResponseUpdate& ru)
+{
+  os << "ResponseUpdate: queryName=" << toNameDigest(ru.getQueryName ())
+     << " responseType=" << toString (ru.getResponseType ())
+     << " queryType=" << toString (ru.getQueryType ())
+     << " result=" << ru.getResult();
+
+  return os;
+}
 } // namespace ndns
 } // namespace ndn
 
-#endif
+#endif /* RESPONSE_UPDATE_HPP_ */

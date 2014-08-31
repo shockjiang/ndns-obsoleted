@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(AppDynamicDnsUpdate)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {
-  string label = "dyndns::Protocol";
+  string label = "AppDynamicDnsUpdate::Protocol";
   printbegin (label);
 
   Zone zone ("/com/skype");
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(Protocol)
 
   Interest interest = update.toInterest ();
 
-  cout << interest.getName().toUri() << endl;
+  cout << toNameDigest(interest.getName()) << endl;
 
   QueryUpdate queryUpdate;
 

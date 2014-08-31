@@ -17,10 +17,15 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <ndn-cxx/util/io.hpp>
+
 #include <boost/program_options.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <ndn-cxx/util/io.hpp>
 #include <ndn-cxx/security/key-chain.hpp>
+
 #include "app/dynamic-dns-update.hpp"
+#include "ndns-enum.hpp"
 
 using namespace ndn;
 using namespace ndn::ndns;
@@ -48,10 +53,8 @@ using namespace boost;
 int
 main (int argc, char * argv[])
 {
-//  DynamicDNSUpdate (const char* programName, const char* prefix, Zone zone, Name rrlabel,
-//  RRType rrtype, std::string rrdata, UpdateAction action=ndn::ndns::UPDATE_ACTION_REPLACE_ALL);
 
-  string keyNameStr;
+  string certStr;
   string zoneStr;
   string rrLabelStr;
   string rrTypeStr;
@@ -66,23 +69,22 @@ main (int argc, char * argv[])
     generic.add_options () ("help,h", "print help message");
 
     po::options_description config ("Configuration");
-    config.add_options ();
+    config.add_options () ("cert,c", po::value<string> (&certStr),
+           "The Certificate of the key which is used to sign the upadte");
+
 
     po::options_description hidden ("Hidden Options");
 
-    hidden.add_options () ("zone,z", po::value<string> (&keyNameStr),
-                               "Name of delegated zone's name")
+    hidden.add_options () ("zone,z", po::value<string>(&zoneStr),
+                               "The zone that delegate the RR record")
                           ("label,l", po::value<string> (&rrLabelStr),
                                "The RR Label to be updated")
                           ("type,t", po::value<string> (&rrTypeStr),
-                                   "The RR Type to be updated: FH|NS|ID-CERT|TXT")
+                               "The RR Type to be updated: FH|NS|ID-CERT|TXT")
                           ("data,d", po::value<string> (&rrData),
-                                   "The RR Data that the record should be changed to")
+                               "The RR Data that the record should be changed to")
                           ("action,a", po::value<string> (&actionStr),
-                                   "The update action: ADD|REMOVE|REPLACE_ALL")
-                          ("key,k", po::value<string> (&keyNameStr),
-                           "The Certificate which is DSK signed by self (root) KSK");
-
+                               "The update action: ADD|REMOVE|REPLACE_ALL");
 
 
 
@@ -93,7 +95,6 @@ main (int argc, char * argv[])
     postion.add("type", 1);
     postion.add("data", 1);
     postion.add("action", 1);
-    postion.add("key", 1);
 
     po::options_description cmdline_options;
     cmdline_options.add (generic).add (config).add (hidden);
@@ -110,43 +111,91 @@ main (int argc, char * argv[])
     po::store (parsed, vm);
     po::notify (vm);
 
-    if (vm.count ("help")) {
-      cout << "E.g: zone-register-root /ksk-1407883612811-SKS.cert" << endl;
+    if (vm.count ("help") || !vm.count("zone") || !vm.count("label") || !vm.count("type")
+        || !vm.count("data") || !vm.count("action")) {
+      if (!vm.count("help")) {
+        cout<<"The command misses some positional parameter. "
+            <<" check the following example: " << endl << "\t";
+      }
+      cout << "E.g: update zone label type data action [-c cert]" << endl;
       cout << visible << endl;
       return 0;
     }
 
   }
   catch (const std::exception& ex) {
-    cout << "Parameter Error: " << ex.what () << endl;
+    cerr << "Parameter Error: " << ex.what () << endl;
     return 0;
   }
   catch (...) {
-    cout << "Parameter Unknown error" << endl;
+    cerr << "Parameter Unknown error" << endl;
     return 0;
   }
 
 
   RRType rrType = toRRType(rrTypeStr);
   if (rrType == RR_UNKNOWN) {
-    cout << "Unkown RRType=" << rrTypeStr << endl;
+    cerr << "Unkown RRType=" << rrTypeStr << endl;
     return 0;
   }
   UpdateAction action = toUpdateAction(actionStr);
   if (action == UPDATE_ACTION_UNKNOWN) {
-    cout << "Unkown UpdateAction=" << actionStr << endl;
+    cerr << "Unkown UpdateAction=" << actionStr << endl;
     return 0;
   }
 
   if (action == UPDATE_ACTION_REPLACE || action == UPDATE_ACTION_NONE) {
-    cout << "NOT support UpdateAction=" << actionStr << endl;
+    cerr << "NOT support UpdateAction=" << actionStr << endl;
     return 0;
   }
 
+  KeyChain keyChain;
 
+  boost::shared_ptr<Certificate> cert;
+  try {
+    if (certStr == "") {
+      cert = keyChain.getDefaultCertificate();
+    }
+    else {
+      cert = keyChain.getCertificate(Name(certStr));
+    }
+  }
+  catch (...) {
+    if (certStr == "")
+      std::cerr << "error to get the default certificate" << endl;
+    else
+      std::cerr << "error to get the certificate: " << certStr << endl;
 
-  return 0;
+    return 0;
+  }
 
+  //  DynamicDNSUpdate (const char* programName, const char* prefix, Zone zone, Name rrlabel,
+  //  RRType rrtype, std::string rrdata, UpdateAction action=ndn::ndns::UPDATE_ACTION_REPLACE_ALL);
+
+  Zone zone(zoneStr);
+  Name rrLabel(rrLabelStr);
+
+  DynamicDNSUpdate update(argv[0], "/", zone, rrLabel, rrType, rrData, action);
+
+  update.run();
+
+  if (update.hasError ()) {
+    cerr << "The program does not get any response:" << endl;
+    cerr << "Error: " << update.getErr () << endl;
+    return -1;
+  }
+  else {
+    const ResponseUpdate& re = update.getResponse();
+    if (re.getResponseType() == RESPONSE_DyNDNS_OK) {
+      cout << "Update successfully" << endl;
+      cout << re << endl;
+      return 1;
+    } else {
+      cerr << "The program gets the response but it fails to update due to: ";
+      cerr << re << endl;
+      return -2;
+    }// fi (DyNDNS_OK)
+  }//fi (hasError)
 }
 
 

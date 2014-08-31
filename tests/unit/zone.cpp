@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(Zone)
 
 BOOST_AUTO_TEST_CASE(Encode)
 {
-  string label = "zone:Encode";
+  string label = "Zone:Encode";
   printbegin (label);
 
   printend (label);

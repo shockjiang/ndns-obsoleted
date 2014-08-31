@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_SUITE(DbDyndnsMgr)
 BOOST_AUTO_TEST_CASE(update)
 {
   KeyChain keyChain;
-  string label = "dyndnsMgr::update";
+  string label = "DbDyndnsMgr::update";
   printbegin (label);
 
   Zone zone (Name ("/net"));

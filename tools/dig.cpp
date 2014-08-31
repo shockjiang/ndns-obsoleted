@@ -86,11 +86,11 @@ main (int argc, char * argv[])
          << "s RRType=" << rrType << " tryMax=" << tryMax << endl;
   }
   catch (const std::exception& ex) {
-    cout << "Parameter Error: " << ex.what () << endl;
+    cerr << "Parameter Error: " << ex.what () << endl;
     return 0;
   }
   catch (...) {
-    cout << "Parameter Unknown error" << endl;
+    cerr << "Parameter Unknown error" << endl;
     return 0;
   }
 
@@ -105,16 +105,18 @@ main (int argc, char * argv[])
   dig.run ();
 
   if (dig.hasError ()) {
-    cout << "\n\n" << dig.getProgramName () << " cannot find any records for Name"
+    cerr << "\n\n" << dig.getProgramName () << " cannot find any records for Name "
          << dig.getDstLabel ().toUri () << " from resolver " << resolver << ". Due to:"
          << std::endl;
-    cout << "Error: " << dig.getErr () << endl;
+    cerr << "Error: " << dig.getErr () << endl;
+    return -1;
   }
   else {
     Name re = dig.getResponse ().getQueryName ();
     if (dig.getRrs ().size () == 0) {
       cout << "Dig found no record(s) for Name " << dig.getDstLabel ().toUri () << std::endl;
       cout << "Final Response Name: " << re.toUri () << std::endl;
+      return 0;
     }
     else {
       cout << "Success to the dig " << dig.getDstLabel ().toUri () << " by Resolver " << resolver
@@ -123,11 +125,13 @@ main (int argc, char * argv[])
       vector<RR> rrs = dig.getRrs ();
       vector<RR>::const_iterator iter = rrs.begin ();
       while (iter != rrs.end ()) {
-        cout << " " << *iter << "\n";
+        cout << *iter << "\n";
         iter++;
       }
       cout << "Final Response Name: " << re.toUri () << std::endl;
-    }
-  }
+      return rrs.size();
+    }//fi (dig.getrrs().size() == 0)
+
+  }//fi (dig.hasError)
 
 }

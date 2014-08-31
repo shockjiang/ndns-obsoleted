@@ -43,19 +43,14 @@ DyndnsMgr::update () throw()
   rr.setZone(m_zone);
   std::string sql;
   RRSet rrset = rr.getRrset();
-  std::cout << rrset << std::endl;
   RRSetMgr rrsetMgr;
   rrsetMgr.addRRSet(rrset);
-
   rrsetMgr.lookupIds();
-
-  std::cout <<"rrset= " << rrset << std::endl;
   rr.setRrset(rrset);
   RRMgr rrMgr;
   rrMgr.addRR(rr);
   rrMgr.lookupIds();
 
-  //std::cout << "rr= " <<rr <<std::endl;
   if (rr.getUpdateAction() == UPDATE_ACTION_NONE) {
     std::cout << "None action" << std::endl;
   }
@@ -64,22 +59,30 @@ DyndnsMgr::update () throw()
       ;// already there, no more ADD
     }
     else {
-      if (rrset.getId() == 0)
+      if (rrset.getId() == 0) {
         rrsetMgr.insert();
+        rr.setRrset(rrset);
+      }
 
       rrMgr.insert();
     }
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_REMOVE) {
-    if (rr.getId() > 0)
+    if (rr.getId() > 0) {
+      std::cout << " to remove rr: " << rr << std::endl;
       rrMgr.remove();
+    } else {
+      std::cout << "rr.getId() == 0. do not have to remove" << std::endl;;
+    }
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_REPLACE_ALL) {
     if (rrset.getId() > 0) {
+      std::cout << "remove RR related to " << rrset << std::endl;
       rrsetMgr.removeRelatedRRs();
     }
     else {
       rrsetMgr.insert();
+      rr.setRrset(rrset);
     }
 
     rrMgr.insert();

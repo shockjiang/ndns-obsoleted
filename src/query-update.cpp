@@ -45,14 +45,12 @@ QueryUpdate::toInterest (KeyChain& keyChain)
   else {
     name = m_forwardingHint;
     name.append (ndn::ndns::label::ForwardingHintLabel);
-
   }
-
-
   name.append (this->m_authorityZone);
   name.append (toString (this->m_queryType));
   name.append (m_wiredUpdate);
   name.append (ndn::ndns::toString (this->m_rrType));
+  name.appendVersion();
   Selectors selector;
 
   Interest interest = Interest (name, selector, -1, this->m_interestLifetime);
@@ -68,57 +66,63 @@ QueryUpdate::fromInterest (const Name& name, const Interest& interest)
 bool
 QueryUpdate::fromInterest (const Interest& interest)
 {
-  Name interestName;
-  interestName = interest.getName ();
-
+  const Name& interestName = interest.getName ();
   std::map<std::string, std::string> map;
   if (ndn::ndns::label::matchUpdateName(interestName.toUri(), map)) {
-    this->m_authorityZone = Name(map["zone"]);
-    this->m_queryType = toQueryType(map["queryType"]);
-    this->m_rrLabel = Name(map["rrLabel"]);
-
-    this->m_rrType = toRRType(map["rrType"]);
-    if (map["hint"] != "") {
-      this->m_forwardingHint = Name(map["hint"]);
-    }
-
-
-    ssize_t temp = 0;
-    // hint cannot be "/"
-    if (map["hint"] == "") {
-      temp += 0;
-    }
-    else if (map["hint"] == "/") {
-      std::cout << "ERROR: forwording hint is /" << std::cout;
-      temp += 1;
-    }
-    else {
-      temp += this->m_forwardingHint.size() + 1;
-    }
-
-    if (map["zone"] == "/") {
-      temp += 0;
-    }
-    else {
-      temp += this->m_authorityZone.size();
-    }
-
-    temp += 1;
-    std::cout << " wiredUpdate at index=" << temp << std::endl;
-    this->m_wiredUpdate = interestName.get(temp).blockFromValue();
-
-    this->m_interestLifetime = interest.getInterestLifetime ();
+    this->fromInterest(interest, map);
+    return true;
   }
   else {
     std::cerr << "The name does not match the patter of NDNS Update: "
-              << interestName.toUri() <<std::endl;
+              << interest.getName().toUri() <<std::endl;
+
+    return false;
+  }
+
+  return false;
+}
+
+bool
+QueryUpdate::fromInterest (const Interest& interest, std::map<std::string, std::string>& map)
+{
+  const Name& interestName = interest.getName ();
+
+  this->m_authorityZone = Name(map["zone"]);
+  this->m_queryType = toQueryType(map["queryType"]);
+  this->m_rrLabel = Name(map["rrLabel"]);
+
+  this->m_rrType = toRRType(map["rrType"]);
+  if (map["hint"] != "") {
+    this->m_forwardingHint = Name(map["hint"]);
   }
 
 
+  ssize_t temp = 0;
+  // hint cannot be "/"
+  if (map["hint"] == "") {
+    temp += 0;
+  }
+  else if (map["hint"] == "/") {
+    std::cerr << "ERROR: forwording hint is /" << std::cout;
+    temp += 1;
+  }
+  else {
+    temp += this->m_forwardingHint.size() + 1;
+  }
 
-  std::cout << "to init data" << std::endl;
+  if (map["zone"] == "/") {
+    temp += 0;
+  }
+  else {
+    temp += this->m_authorityZone.size();
+  }
+
+  temp += 1;
+  this->m_wiredUpdate = interestName.get(temp).blockFromValue();
+  this->m_interestLifetime = interest.getInterestLifetime ();
+  //std::cout << "to init data" << std::endl;
   Data data (m_wiredUpdate);
-  std::cout << data << std::endl;
+
   m_update.fromData (data);
 
   return true;

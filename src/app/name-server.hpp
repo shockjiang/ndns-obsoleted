@@ -21,8 +21,8 @@
 #define NDNS_APP_NAME_SERVER_HPP
 
 #include <regex>
+#include <stdexcept>
 
-//#include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 
 #include <ndn-cxx/face.hpp>
@@ -36,7 +36,9 @@
 #include "query.hpp"
 #include "query-update.hpp"
 #include "response.hpp"
+#include "response-update.hpp"
 #include "rr.hpp"
+#include "ndns-label.hpp"
 
 #include "ndn-app.hpp"
 

@@ -17,24 +17,7 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/**
- * Copyright (c) 2014, Regents of the University of California.
- *
- * This file is part of NDNS (Named Data Networking Domain Name Service).
- * See AUTHORS.md for complete list of NDNS authors and contributors.
- *
- * NDNS is free software: you can redistribute it and/or modify it under the terms
- * of the GNU General Public License as published by the Free Software Foundation,
- * either version 3 of the License, or (at your option) any later version.
- *
- * NDNS is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE.  See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
- */
+#include <fstream>
 
 #include <ndn-cxx/security/key-chain.hpp>
 #include <ndn-cxx/util/time.hpp>
@@ -62,7 +45,12 @@ using namespace boost;
  *  2) KeyChain System: hold a KSK and its self-signed certificate
  *  3) KeyChain System: hold a DSK, as default key; and its self-KSK-signed certificate as the default
  *  4) File System: KSK self-signed certificate with suffix <KeyName>-SS.cert
- *  5) File System: DKS signed by KSk certificate with suffix <KeyName>-KS.cert
+ *  5) File System: DKS signed by KSk certificate with suffix <KeyName>-SKS.cert
+ *
+ *
+ *  -SS.cert (self-signed)
+ *  -SKS.cert (self's Key signed)
+ *  -PKS.cert (parent's Key Signed)
  */
 
 int
@@ -78,6 +66,8 @@ main (int argc, char * argv[])
   system_clock::TimePoint notBefore;
   system_clock::TimePoint notAfter;
 
+  bool store = false;
+
   try {
 
     namespace po = boost::program_options;
@@ -91,7 +81,9 @@ main (int argc, char * argv[])
                                                     "certificate ending date, YYYYMMDDhhmmss");
 
     po::options_description config ("Configuration");
-    config.add_options () ("zone,z", po::value<std::string> (&zoneNameStr), "set the identity");
+    config.add_options () ("zone,z", po::value<std::string> (&zoneNameStr), "set the identity")
+                          ("store,s", "to store the Key&Certificate Name to zone-info.txt. Default is not");
+
 
     po::options_description hidden ("Hidden Options");
     hidden.add_options ();
@@ -133,10 +125,15 @@ main (int argc, char * argv[])
     po::store (parsed, vm);
     po::notify (vm);
 
-    if (vm.count ("help")) {
-      cout << "E.g: zone-build /net/ndnsim" << endl;
+    if (vm.count ("help")|| !vm.count("zone")) {
+        std::string temp(argv[0]);
+        cout << "E.g: " << argv[0] << " ZoneName|SiteName" << endl;
       cout << visible << endl;
       return 0;
+    }
+
+    if (vm.count("store")) {
+      store = true;
     }
 
   }
@@ -157,7 +154,7 @@ main (int argc, char * argv[])
 
   if (keyChain.doesIdentityExist (identity)) {
     cout << "Identity with name=" << zoneNameStr << " already exists in KeyChain System" << endl;
-    return 0;
+    return -1;
   }
 
   KSKName = keyChain.generateRsaKeyPair (identity, true); //KSK
@@ -184,12 +181,21 @@ main (int argc, char * argv[])
   keyChain.sign (*cert2, cert->getName ());
   keyChain.addCertificateAsKeyDefault (*cert2);
 
-  temp = DSKName.toUri ();
-  replace_all (temp, "/", "-");
-  fout = temp.substr (1) + "-SKS.cert"; //self-KSK-signed
-  ndn::io::save (*cert2, fout);
+  std::string temp2 = DSKName.toUri ();
+  replace_all (temp2, "/", "-");
+  string fout2 = temp2.substr (1) + "-SKS.cert"; //self-KSK-signed
+  ndn::io::save (*cert2, fout2);
   cout << *cert2 << endl;
-  cout << "save cert to file: " << fout << endl;
+  cout << "save cert to file: " << fout2 << endl;
+
+  //cert is the KSK-SS.cert, cert2 is DSK-SKS.cert
+  if (store) {
+    ofstream f("zone-details.txt", ios::app);
+    f << zoneNameStr << " " << cert->getName().toUri() << " " << fout << " "
+      << cert2->getName().toUri() << " " << fout2 << endl;
+    f.close();
+  }
+  return 1;
 
 } //main
 

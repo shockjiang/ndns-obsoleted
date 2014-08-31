@@ -48,7 +48,7 @@ public:
   tryRegister ();
 
   bool
-  doRegisterRoot ();
+  doRegisterTop ();
 
   bool
   doRegisterZone ();
@@ -101,9 +101,22 @@ public:
     m_nsDatas.push_back (nsdata);
   }
 
+  RRType
+  getRrType () const
+  {
+    return m_rrType;
+  }
+
+  void
+  setRrType (RRType rrType)
+  {
+    m_rrType = rrType;
+  }
+
 private:
   Zone& m_zone;
   Zone& m_subzone;
+  RRType m_rrType;
 
   std::vector<RR> m_rrs;
 

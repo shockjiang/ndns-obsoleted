@@ -97,7 +97,7 @@ main (int argc, char * argv[])
   cout << "the server ends with hasError=" << server.hasError () << endl;
 
   if (server.hasError ()) {
-    return 0;
+    return -1;
   }
   else {
     return 1;

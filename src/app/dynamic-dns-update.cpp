@@ -43,6 +43,7 @@ DynamicDNSUpdate::onData (const ndn::Interest& interest, Data& data)
 {
   m_response.fromData(data);
   std::cout << "[* -> *] get response: " << m_response << std::endl;
+  this->stop();
 }
 
 
@@ -52,11 +53,12 @@ DynamicDNSUpdate::send(const Interest& interest)
   try {
     m_face.expressInterest (interest, boost::bind (&DynamicDNSUpdate::onData, this, _1, _2),
                             boost::bind (&DynamicDNSUpdate::onTimeout, this, _1));
-    std::cout << "[* <- *] send Interest: " << interest.getName ().toUri () << std::endl;
+    std::cout << "[* <- *] send Interest: " << toNameDigest(interest.getName ()) << std::endl;
   }
   catch (std::exception& e) {
     m_hasError = true;
     m_error = e.what ();
+    std::cout << "Fail to send Interest: " << m_error << std::endl;
   }
   m_interestTriedNum += 1;
 }
@@ -72,7 +74,7 @@ DynamicDNSUpdate::send()
 void
 DynamicDNSUpdate::onTimeout (const Interest& interest)
 {
-  std::cout << "[* !! *] timeout Interest" << interest.getName () << std::endl;
+  std::cout << "[* !! *] timeout Interest: " << toNameDigest(interest.getName ()) << std::endl;
 
   if (m_interestTriedNum >= m_interestTriedMax) {
     m_error = "All Interests timeout";
@@ -88,7 +90,6 @@ DynamicDNSUpdate::onTimeout (const Interest& interest)
 void
 DynamicDNSUpdate::run ()
 {
-
   this->send ();
 
   try {

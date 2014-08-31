@@ -45,7 +45,7 @@ QueryMgr::hasAuth ()
   sql += "rrsets.type=\'";
   sql += toString (m_query.getRrType ());
   sql += "\' AND ";
-  sql += "rrsets.label LIKE\'";
+  sql += "rrsets.label LIKE \'";
   sql += m_query.getRrLabel ().toUri () + "/%\'";
 
   this->setTempInt(0);

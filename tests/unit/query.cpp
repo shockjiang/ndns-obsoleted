@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(Query)
 
 BOOST_AUTO_TEST_CASE(UnderstandInterest)
 {
-  printbegin ("query::UnderstandInterst");
+  printbegin ("Query::UnderstandInterst");
   ndns::Query q;
   q.setFowardingHint (Name ("/ucla"));
 

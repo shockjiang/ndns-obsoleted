@@ -217,11 +217,14 @@ protected:
 inline std::ostream&
 operator<< (std::ostream& os, const IterativeQuery iq)
 {
-  os << "InterativeQuery: dstLabel=" << iq.getQuery ().getRrLabel ().toUri () << " currentStep="
-     << toString (iq.getStep ()) << " finishedLabel=" << iq.getFinishedLabelNum () << " rrLabelen="
-     << iq.getRrLabelLen () << " NextAuZoneIndex=" << iq.getAuthZoneIndex () << " [OriginalQuery: "
-     << iq.getQuery () << "]" << " [LastReponse: " << iq.getLastResponse () << "]"
-     << " [LastInterest: " << iq.getLastInterest () << "]";
+  os << "InterativeQuery: dstLabel=" << iq.getQuery ().getRrLabel ().toUri ()
+    << " currentStep=" << toString (iq.getStep ())
+    << " finishedLabel=" << iq.getFinishedLabelNum ()
+    << " rrLabelen=" << iq.getRrLabelLen ()
+    << " NextAuZoneIndex=" << iq.getAuthZoneIndex ()
+    << " OriginalQuery=(" << iq.getQuery () << ")"
+    << " LastReponse=$" << iq.getLastResponse () << "$"
+    << " LastInterest=" << iq.getLastInterest ().getName().toUri();
 
   return os;
 }

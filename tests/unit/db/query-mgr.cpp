@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_SUITE(DbQueryMgr)
 BOOST_AUTO_TEST_CASE(db)
 {
 
-  string label = "rrMgr::db";
+  string label = "DbQueryMgr::db";
   printbegin (label);
 
   ndns::Query q;

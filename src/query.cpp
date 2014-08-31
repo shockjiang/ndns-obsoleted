@@ -42,58 +42,34 @@ Query::fromInterest (const Name &name, const Interest &interest)
 bool
 Query::fromInterest (const Interest& interest)
 {
-  Name interestName;
-  interestName = interest.getName ();
+  const Name& interestName = interest.getName ();
 
   std::map<std::string, std::string> map;
   if (ndn::ndns::label::matchQueryName(interestName.toUri(), map)) {
-    this->m_authorityZone = Name(map["zone"]);
-    this->m_queryType = toQueryType(map["queryType"]);
-    this->m_rrLabel = Name(map["rrLabel"]);
-    this->m_rrType = toRRType(map["rrType"]);
-    if (map["hint"] != "") {
-      this->m_forwardingHint = Name(map["hint"]);
-    }
-
-    this->m_interestLifetime = interest.getInterestLifetime ();
+    this->fromInterest(interest, map);
+    return true;
   }
   else {
     std::cerr << "The name does not match the patter of NDNS Query: "
               << interestName.toUri() <<std::endl;
+    return false;
+  }
+  return false;
+}
+
+bool
+Query::fromInterest (const Interest& interest, std::map<std::string, std::string>& map)
+{
+  this->m_authorityZone = Name(map["zone"]);
+  this->m_queryType = toQueryType(map["queryType"]);
+  this->m_rrLabel = Name(map["rrLabel"]);
+  this->m_rrType = toRRType(map["rrType"]);
+  if (map["hint"] != "") {
+    this->m_forwardingHint = Name(map["hint"]);
   }
 
-//
-//
-//  int qtflag = -1;
-//  int zoneStart = -1;
-//  size_t len = interestName.size ();
-//
-//  for (size_t i = 0; i < len; i++) {
-//    ndn::Name::Component comp = interestName.get (i);
-//    if (comp == ndn::ndns::label::ForwardingHintComp) {
-//      zoneStart = i;
-//    }
-//    else if (comp == ndn::ndns::label::QueryDNSComp || comp == ndn::ndns::label::QueryDNSRComp) {
-//      qtflag = i;
-//      break;
-//    }
-//  } //for
-//
-//  if (qtflag == -1) {
-//    std::cerr << "There is no QueryType in the Interest Name: " << interestName << std::endl;
-//    return false;
-//  }
-//  this->m_queryType = toQueryType (interestName.get (qtflag).toUri ());
-//  this->m_rrType = toRRType (interestName.get (len - 1).toUri ());
-//  if (zoneStart == -1) {
-//    this->m_authorityZone = interestName.getPrefix (qtflag); //the DNS/DNS-R is not included
-//  }
-//  else {
-//    this->m_forwardingHint = interestName.getPrefix (zoneStart);
-//    this->m_authorityZone = interestName.getSubName (zoneStart + 1, qtflag - zoneStart - 1);
-//  }
-//  this->m_interestLifetime = interest.getInterestLifetime ();
-//  this->m_rrLabel = interestName.getSubName (qtflag + 1, len - qtflag - 2);
+  this->m_interestLifetime = interest.getInterestLifetime ();
+
   return true;
 }
 

@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_SUITE(Response)
 BOOST_AUTO_TEST_CASE(Encode)
 {
 
-  printbegin ("response:Encode");
+  printbegin ("Response:Encode");
 
 
 
@@ -46,9 +46,6 @@ BOOST_AUTO_TEST_CASE(Encode)
 
   Zone zone ("/");
   Zone zone2 ("/net");
-
-  zone.setId (1);
-  zone2.setId (2);
 
   RRSet rrset1 (zone);
   rrset1.setLabel(zone2.getAuthorizedName());
@@ -100,8 +97,6 @@ BOOST_AUTO_TEST_CASE(Encode)
   BOOST_CHECK_EQUAL(re.getResponseType (), re2.getResponseType ());
   BOOST_CHECK_EQUAL(re.getRrs ().size (), re2.getRrs ().size ());
   BOOST_CHECK_EQUAL(re.getStringRRs(), re2.getStringRRs());
-  //RR: Id=203 Data=www3.ex.ne... [RRSet=RRSet: Id=0 Zone=/ Label=/net Type=NS Class=] UpdateAction=NONE RR: Id=204 Data=www4.ex.co... [RRSet=RRSet: Id=0 Zone=/ Label=/com Type=NS Class=] UpdateAction=NONE]
-  //RR: Id=203 Data=www3.ex.ne... [RRSet=RRSet: Id=0 Zone=/ Label=/net Type=NS Class=] UpdateAction=NONE RR: Id=204 Data=www4.ex.co... [RRSet=RRSet: Id=0 Zone=/ Label=/net Type=NS Class=] UpdateAction=NONE]]
 
   printend ("response:Encode");
 }

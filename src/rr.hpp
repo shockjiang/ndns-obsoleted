@@ -43,6 +43,55 @@ public:
   virtual
   ~RR ();
 
+
+
+  inline bool
+  operator== (const RR& rr) const
+  {
+    if (this->getRrData () == rr.getRrData ())
+      return true;
+
+    return false;
+  }
+
+  template<bool T>
+    inline size_t
+    wireEncode (EncodingImpl<T> & block) const
+    {
+     size_t totalLength = 0;
+
+     std::string msg = toString(m_updateAction);
+     totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRUpdateAction,
+                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
+                                            msg.size ());
+
+     msg = this->getRrData ();
+     totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRDataRecord,
+                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
+                                            msg.size ());
+
+     msg = this->getZone().getAuthorizedName().toUri();
+     totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRZone,
+                                           reinterpret_cast<const uint8_t*> (msg.c_str ()),
+                                           msg.size ());
+
+
+      totalLength += prependNonNegativeIntegerBlock (block, ndn::ndns::tlv::RRDataSub1,
+                                                     this->getId ());
+
+      totalLength += block.prependVarNumber (totalLength);
+      totalLength += block.prependVarNumber (ndn::ndns::tlv::RRData);
+      //std::cout<<"call rr.h wireEncode"<<std::endl;
+      return totalLength;
+    }
+
+  const Block&
+  wireEncode () const;
+
+  void
+  wireDecode (const Block& wire);
+
+  //////////////////////////////////////////////////////////////////
 public:
 
   void
@@ -66,6 +115,12 @@ public:
   setZone (const Name& zone)
   {
     m_rrset.setZone(zone);
+  }
+
+  const Zone&
+  getZone () const
+  {
+    return m_rrset.getZone();
   }
 
   uint32_t
@@ -92,47 +147,6 @@ public:
     m_wire = wire;
   }
 
-  inline bool
-  operator== (const RR& rr) const
-  {
-    if (this->getRrData () == rr.getRrData ())
-      return true;
-
-    return false;
-  }
-
-  template<bool T>
-    inline size_t
-    wireEncode (EncodingImpl<T> & block) const
-    {
-      size_t totalLength = 0;
-
-      std::string msg = toString(m_updateAction);
-      totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRUpdateAction,
-                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
-                                            msg.size ());
-
-       msg = this->getRrData ();
-      totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRDataRecord,
-                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
-                                            msg.size ());
-
-      totalLength += prependNonNegativeIntegerBlock (block, ndn::ndns::tlv::RRDataSub1,
-                                                     this->getId ());
-
-      totalLength += block.prependVarNumber (totalLength);
-      totalLength += block.prependVarNumber (ndn::ndns::tlv::RRData);
-      //std::cout<<"call rr.h wireEncode"<<std::endl;
-      return totalLength;
-    }
-
-  const Block&
-  wireEncode () const;
-
-  void
-  wireDecode (const Block& wire);
-
-  //////////////////////////////////////////////////////////////////
 
   uint32_t
   getTtl () const
@@ -212,16 +226,18 @@ private:
 inline std::ostream&
 operator<< (std::ostream& os, const RR& rr)
 {
-  os << "RR: Id=" << rr.getId () << " Data=";
-  int maxsize = 10;
+  os << "RR: Id=" << rr.getId ()
+    << " Data=";
+  int maxsize = 23;
   if (rr.getRrData().size() > maxsize) {
-   os  << rr.getRrData ().substr (0, 10) + "...";
+   os  << rr.getRrData ().substr (0, maxsize-3) + "...";
   }
   else {
     os << rr.getRrData();
   }
-  os << " [RRSet=" << rr.getRrset () << "]";
+  os << " rrset=[" << rr.getRrset () << "]";
   os << " UpdateAction=" << toString(rr.getUpdateAction());
+  os << "";
   return os;
 }
 

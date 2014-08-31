@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_SUITE(QueryUpdate)
 BOOST_AUTO_TEST_CASE(UnderstandInterest)
 {
 
-  string label = "queryUpdate::UnderstandInterst";
+  string label = "QueryUpdate::UnderstandInterst";
   printbegin (label);
 
   KeyChain keyChain;
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(UnderstandInterest)
 
 
   Zone zone("/net");
-  zone.setId(2);
+  zone.setId(0);
   RRType rrType = RR_FH;
   Name rrLabel = Name("/skype");
   std::string rrData = "/att";
@@ -92,12 +92,12 @@ BOOST_AUTO_TEST_CASE(UnderstandInterest)
   Interest interest = q.toInterest (keyChain);
   Name name0 = interest.getName();
 
-  cout << "InterestName=" << interest.getName () << endl;
+  cout << "InterestName=" << toNameDigest(interest.getName ()) << endl;
 
   ndns::QueryUpdate q2;
   q2.fromInterest (interest);
 
-  cout << "AuthZone=" << q2.getAuthorityZone () << " RRLable=" << q2.getRrLabel () << endl;
+  cout << "AuthZone=" << q2.getAuthorityZone () << endl;
   BOOST_CHECK_EQUAL(q.getAuthorityZone (), q2.getAuthorityZone ());
   BOOST_CHECK_EQUAL(q.getUpdate().getStringRRs(), q2.getUpdate().getStringRRs());
   BOOST_CHECK_EQUAL(q.getQueryType (), q2.getQueryType ());

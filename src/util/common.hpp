@@ -17,32 +17,29 @@
  * NDNS, e.g., in COPYING.md file.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "iterative-query.hpp"
-#include "boost-test.hpp"
+#ifndef NDNS_UTIL_COMMON_HPP
+#define NDNS_UTIL_COMMON_HPP
 
-//#include <boost/test/test_tools.hpp>
-//#include <string>
+#include <iostream>
+#include <string>
+#include <ndn-cxx/name.hpp>
 
-namespace ndn {
-namespace ndns {
-namespace tests {
+inline std::string toNameDigest(std::string str, int prefixLen=30, int surfixLen=30) {
+  std::string str2 = str;
+  int len = str.size();
+  if (len > prefixLen + surfixLen) {
+    str2 = str.substr(0, prefixLen) + "..." + str.substr(len-surfixLen, surfixLen);
+  }
 
-using namespace std;
-
-BOOST_AUTO_TEST_SUITE(IterativeQuery)
-
-BOOST_AUTO_TEST_CASE(Protocol)
-{
-  string label = "IterativeQuery::Protocol";
-  printbegin (label);
-
-  Query q;
-
-  printend (label);
+  return str2;
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+inline std::string toNameDigest(ndn::Name name, int prefixLen=30, int surfixLen=30) {
+  std::string str2 = name.toUri();
+  return toNameDigest(str2, prefixLen, surfixLen);
+}
 
-}// namespace tests
-}// namespace ndns
-} // namespace ndn
+
+
+
+#endif

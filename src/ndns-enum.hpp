@@ -23,6 +23,8 @@
 namespace ndn {
 namespace ndns {
 
+
+
 enum RRType
 {
   RR_NS = 1,
@@ -116,19 +118,19 @@ toString (ResponseType responseType)
   std::string label;
   switch (responseType) {
   case RESPONSE_NDNS_Resp:
-    label = "NDNS Resp";
+    label = "NDNS-Resp";
     break;
   case RESPONSE_NDNS_Nack:
-    label = "NDNS Nack";
+    label = "NDNS-Nack";
     break;
   case RESPONSE_NDNS_Auth:
-    label = "NDNS Auth";
+    label = "NDNS-Auth";
     break;
   case RESPONSE_DyNDNS_OK:
-    label = "DyNDNS OK";
+    label = "DyNDNS-OK";
     break;
   case RESPONSE_DyNDNS_FAIL:
-    label = "DyNDNS Fail";
+    label = "DyNDNS-Fail";
     break;
   default:
     label = "UNKNOWN";
@@ -141,18 +143,18 @@ inline ResponseType
 toResponseType (const std::string& str)
 {
   ResponseType atype;
-  if (str == "NDNS Resp") {
+  if (str == "NDNS-Resp") {
     atype = RESPONSE_NDNS_Resp;
   }
-  else if (str == "NDNS Nack") {
+  else if (str == "NDNS-Nack") {
     atype = RESPONSE_NDNS_Nack;
   }
-  else if (str == "NDNS Auth") {
+  else if (str == "NDNS-Auth") {
     atype = RESPONSE_NDNS_Auth;
   }
-  else if (str == "DyNDNS OK")
+  else if (str == "DyNDNS-OK")
     atype = RESPONSE_DyNDNS_OK;
-  else if (str == "DyNDNS Fail")
+  else if (str == "DyNDNS-Fail")
     atype = RESPONSE_DyNDNS_FAIL;
   else {
     atype = RESPONSE_UNKNOWN;
@@ -307,9 +309,9 @@ toUpdateAction(const std::string& str)
     action = UPDATE_ACTION_NONE;
   else if (str == "ADD")
     action = UPDATE_ACTION_ADD;
-  else if (str == "RREMOVE")
+  else if (str == "REMOVE")
     action = UPDATE_ACTION_REMOVE;
-  else if (str == "REPLACE_ALL")
+  else if (str == "REPLACE-ALL")
     action = UPDATE_ACTION_REPLACE_ALL;
   else if (str == "REPLACE")
     action = UPDATE_ACTION_REPLACE;
@@ -339,7 +341,7 @@ toString(UpdateAction action)
     str = "REPLACE";
     break;
   case UPDATE_ACTION_REPLACE_ALL:
-    str = "REPLACE_ALL";
+    str = "REPLACE-ALL";
     break;
   default:
     str = "UNKNOWN";

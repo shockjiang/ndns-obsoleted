@@ -47,9 +47,6 @@ public:
   void
   remove();
 
-  void
-  replace_all();
-
   inline void
   addRR (RR& rr)
   {

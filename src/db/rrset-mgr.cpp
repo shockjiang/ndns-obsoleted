@@ -92,13 +92,16 @@ RRSetMgr::removeRelatedRRs ()
 {
   std::string sql;
   std::vector<RRSet*>::iterator iter = m_rrsets.begin ();
+  this->open();
   while (iter != m_rrsets.end ()) {
     RRSet& rrset = **iter;
     sql = "DELETE FROM rrs where rrset_id=";
     sql += std::to_string (rrset.getId ());
-
+    this->executeOnly(sql, this->static_callback_doNothing, this);
     iter++;
   }
+
+  this->close();
 }
 
 } /* namespace ndns */

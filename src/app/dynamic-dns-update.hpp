@@ -28,6 +28,7 @@
 #include "zone.hpp"
 #include "ndns-enum.hpp"
 #include "query-update.hpp"
+#include "response-update.hpp"
 
 namespace ndn {
 namespace ndns {
@@ -63,14 +64,14 @@ public:
   void
   send();
 
-  const Response&
+  const ResponseUpdate&
   getResponse () const
   {
     return m_response;
   }
 
   void
-  setResponse (const Response& response)
+  setResponse (const ResponseUpdate& response)
   {
     m_response = response;
   }
@@ -173,7 +174,7 @@ private:
   /**
    *
    */
-  Response m_response;
+  ResponseUpdate m_response;
 
   Name m_rrLabel;
   RRType m_rrType;

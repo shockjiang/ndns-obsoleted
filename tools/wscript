@@ -9,45 +9,67 @@ def build(bld):
         bld(
             features='cxx cxxprogram',
             source = "name-server-daemon.cpp",
-            target = "name-server-daemon",
+            target = "../server-daemon",
             use = "ndns-objects"
         )
         
         bld(
             features='cxx cxxprogram',
             source = "caching-resolver-daemon.cpp",
-            target = "caching-resolver-daemon",
+            target = "../resolver-daemon",
             use = "ndns-objects"
         )
         
         bld(
             features='cxx cxxprogram',
             source = "dig.cpp",
-            target = "dig",
+            target = "../dig",
             use = "ndns-objects"
         )
         
+               
         bld(
             features='cxx cxxprogram',
-            source = "zone-build.cpp",
-            target = "zone-build",
+            source = "update.cpp",
+            target = "../update",
             use = "ndns-objects",
         )
         
         bld(
             features='cxx cxxprogram',
-            source = "zone-register-root.cpp",
-            target = "zone-register-root",
+            source = "zone-create.cpp",
+            target = "../zone-create",
             use = "ndns-objects",
+            name = "zone-create",
         )
         
         bld(
             features='cxx cxxprogram',
             source = "zone-register.cpp",
-            target = "zone-register",
+            target = "../zone-register",
             use = "ndns-objects",
         )
         
         
-    
-    
+        bld(
+            features='cxx cxxprogram',
+            name = "zone-delegate",
+            source = "zone-delegate.cpp",
+            target = "../zone-delegate",
+
+            use = "ndns-objects",
+        )
+        
+        bld(
+            rule = "cp ${SRC} ${TGT}",
+            source = "../zone-create",
+            target = "../site-create",
+            use = "zone-create"
+        )
+
+        bld(
+            rule = "cp ${SRC} ${TGT}",
+            source = "../zone-delegate",
+            target = "../site-delegate",
+            use = "zone-delegate"
+        )

@@ -152,7 +152,7 @@ template<class IQStrategy>
       name.append (toString (iq.getQuery ().getRrType ()));
       name.appendVersion ();
       data.setName (name);
-      data.setFreshnessPeriod (iq.getLastResponse ().getFreshness ());
+      data.setFreshnessPeriod (this->m_contentFreshness);
 
       m_keyChain.sign (data);
       m_face.put (data);
@@ -193,10 +193,8 @@ template<class IQStrategy>
   {
     Query query;
     query.fromInterest (interest);
-    //std::cout << "[* -> *] receive Interest: " << interest.getName ().toUri () << std::endl;
-    if (query.getQueryType () == QUERY_DNS) {
-      cout << m_programName << " is not in charge of Query_DNS" << endl;
-    }
+    std::cout << "[* -> *] receive Interest: " << interest.getName ().toUri () << std::endl;
+
     //std::cout << "LINE=" <<__LINE__<<std::endl;
     IQStrategy iq (query);
 

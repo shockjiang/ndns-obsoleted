@@ -35,6 +35,17 @@ public:
   virtual
   ~NameDig ();
 
+
+  /**
+   * @brief construct a query (interest) which contains the update information
+   */
+  Interest
+  toInterest ();
+
+
+  void
+  sendQuery (Interest& interest);
+
   void
   onData (const ndn::Interest& interest, Data& data);
 

@@ -62,15 +62,23 @@ RRMgr::lookupIds()
 void
 RRMgr::remove()
 {
+  std::string sql;
+
+  std::vector<RR*>::iterator iter = m_rrs.begin ();
+
+  this->open ();
+  while (iter != m_rrs.end ()) {
+    RR& rr = **iter;
+    sql = "DELETE from rrs WHERE id=";
+    sql += std::to_string (rr.getId ());
+
+    this->executeOnly (sql, this->static_callback_doNothing, this);
+    iter++;
+  }
+
+  this->close ();
 
 }
-
-void
-RRMgr::replace_all()
-{
-
-}
-
 
 void
 RRMgr::insert ()

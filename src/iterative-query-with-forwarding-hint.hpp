@@ -96,14 +96,16 @@ private:
 inline std::ostream&
 operator<< (std::ostream& os, const IterativeQueryWithForwardingHint iq)
 {
-  os << "IterativeQueryWithFowardingHint: dstLabel=" << iq.getQuery ().getRrLabel ().toUri ()
-     << " currentStep=" << toString (iq.getStep ()) << " finishedLabel="
-     << iq.getFinishedLabelNum () << " FHint=" << iq.getForwardingHint ().toUri () << " rrLabelen="
-     << iq.getRrLabelLen () << " NextAuZoneIndex=" << iq.getAuthZoneIndex ()
-
-     << " [OriginalQuery: "
-     << iq.getQuery () << "]" << " [LastReponse: " << iq.getLastResponse () << "]"
-     << " [LastInterest: " << iq.getLastInterest () << "]";
+  os << "IterativeQueryWithFowardingHint: dstLabel="
+    << iq.getQuery ().getRrLabel ().toUri ()
+     << " currentStep=" << toString (iq.getStep ())
+     << " finishedLabel=" << iq.getFinishedLabelNum ()
+     << " FHint=" << iq.getForwardingHint ().toUri ()
+     << " rrLabelen=" << iq.getRrLabelLen ()
+     << " NextAuZoneIndex=" << iq.getAuthZoneIndex ()
+     << " OriginalQuery=[" << iq.getQuery () << "]"
+     << " LastReponse=$" << iq.getLastResponse () << "$"
+     << " LastInterest=" << iq.getLastInterest ().getName().toUri();
 
   return os;
 }

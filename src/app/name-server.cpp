@@ -35,16 +35,20 @@ void
 NameServer::onInterest (const Name &name, const Interest &interest)
 {
 
-  cout << "[* -> *] receive Interest: " << interest.getName ().toUri () << std::endl;
+  cout << "[* -> *] receive Interest: " << toNameDigest(interest.getName ()) << std::endl;
 
   std::string nameStr = interest.getName().toUri();
 
-  std::match_results<std::string::const_iterator> results;
-  if (std::regex_match(nameStr, results, ndn::ndns::label::UPDATE_NAME_REGEX)) {
+  std::map<std::string, std::string> map;
+  //if (std::regex_match(nameStr, results, ndn::ndns::label::UPDATE_NAME_REGEX)) {
+  if (ndn::ndns::label::matchUpdateName (nameStr, map)) {
+    //Here is Update Message
+
     QueryUpdate queryUpdate;
-    Response re;
-    queryUpdate.fromInterest(interest);
+    queryUpdate.fromInterest(interest);//, map);
+    ResponseUpdate re;
     queryUpdate.setUpdateZone(m_zone);
+
     DyndnsMgr mgr(m_zone, re, queryUpdate);
 
     re.setQueryName(interest.getName());
@@ -55,27 +59,38 @@ NameServer::onInterest (const Name &name, const Interest &interest)
     try {
       mgr.update();
     }
-    catch (std::exception& e) {
+    catch (std::runtime_error& e) {
       //basically, it handles the runtime_error shrowed by executeOnly (in db-mgr.cpp)
       std::cout << e.what() << std::endl;
       re.setResponseType(RESPONSE_DyNDNS_FAIL);
-      msg = e.what();
+      msg = "Failed: ";
+      msg += e.what();
+    }
+    catch (...) {
+      re.setResponseType(RESPONSE_DyNDNS_FAIL);
+      msg = "Failed: Unknown Internal Error";
+      std::cout << msg << std::endl;
     }
 
-    const std::vector<RR>& rrs = queryUpdate.getUpdate().getRrs();
-    const RR& rr = rrs[0];
-    if (rr.getId() == 0) {
-      re.setResponseType(RESPONSE_DyNDNS_FAIL);
-      msg = "Unknown Reason";
-    }
+//    const std::vector<RR>& rrs = queryUpdate.getUpdate().getRrs();
+//    const RR& rr = rrs[0];
+//    if (rr.getId() == 0) {
+//      re.setResponseType(RESPONSE_DyNDNS_FAIL);
+//      msg = "Failed: Unknown Reason";
+//      std::cout << "update failed due to " << msg << std::endl;
+//      //error when duplicated ADD/REMOVE operations
+//    }
+//
+    re.setResult(msg);
+
+    std::cout << re << std::endl;;
 
 
     Data data = re.toData();
     data.setFreshnessPeriod (re.getFreshness ());
-    data.setContent(reinterpret_cast<const uint8_t*>(msg.c_str()), msg.size());
     m_keyChain.sign (data);
     m_face.put (data);
-    cout << "[* <- *] send response: " << re << ": " << data << endl;
+    cout << "[* <- *] send response: " << re << endl;
 
     /*
      * check the update agains? NDNs security policy
@@ -87,9 +102,16 @@ NameServer::onInterest (const Name &name, const Interest &interest)
 
 
   }
-  else if (std::regex_match(nameStr, results, ndn::ndns::label::QUERY_NAME_REGEX)) {
+ //else if (std::regex_match(nameStr, results, ndn::ndns::label::DNS_QUERY_NAME_REGEX)) {
+  else if (ndn::ndns::label::matchQueryName(nameStr, map)) {
+    //Here is Query Message
+
     Query query;
+    query.fromInterest(interest);
+
+
     Response response;
+
     Name name2 = interest.getName ();
     name2.appendVersion ();
     response.setQueryName (name2);
@@ -131,7 +153,8 @@ NameServer::onInterest (const Name &name, const Interest &interest)
     cout << "[* <- *] send response: " << response << ": " << data << endl;
   }
   else {
-
+    // illegal RR Type, Query Type are here
+    cerr << "get Illegal Interest: " << interest << endl;
   }
 
 } //onInterest

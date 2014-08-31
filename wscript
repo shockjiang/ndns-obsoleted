@@ -16,7 +16,7 @@ def options(opt):
 
     ropt.add_option('--with-tests', action='store_true', default=False, dest='with_tests',
                     help='''build unit tests''')
-    ropt.add_option('--with-tools', action='store_true', default=False, dest='with_tools',
+    ropt.add_option('--with-tools', action='store_true', default=True, dest='with_tools',
                     help='''build tool apps''')
 def configure(conf):
     conf.load(['compiler_cxx', 'gnu_dirs',

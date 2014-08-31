@@ -26,6 +26,7 @@ ndn::ndns::ZoneRegister::ZoneRegister (Zone& zone, Zone& subzone,
   boost::shared_ptr<IdentityCertificate>& cert)
   : m_zone (zone)
   , m_subzone (subzone)
+  , m_rrType (RR_NS)
   , m_subZoneKSKSignedByDSKCert (*cert)
 {
   //std::cout<<m_subZoneKSKSignedByDSKCert<<std::endl;
@@ -34,6 +35,7 @@ ndn::ndns::ZoneRegister::ZoneRegister (Zone& zone, Zone& subzone,
 ndn::ndns::ZoneRegister::ZoneRegister (Zone& zone, Zone& subzone, IdentityCertificate& cert)
   : m_zone (zone)
   , m_subzone (subzone)
+  , m_rrType (RR_NS)
   , m_subZoneKSKSignedByDSKCert (cert)
 {
   //std::cout<<m_subZoneKSKSignedByDSKCert<<std::endl;
@@ -47,7 +49,7 @@ bool
 ZoneRegister::tryRegister ()
 {
   if (m_zone.getAuthorizedName () == m_subzone.getAuthorizedName ()) {
-    return doRegisterRoot ();
+    return doRegisterTop ();
   }
   else {
     return doRegisterZone ();
@@ -55,8 +57,13 @@ ZoneRegister::tryRegister ()
 }
 
 bool
-ZoneRegister::doRegisterRoot ()
+ZoneRegister::doRegisterTop ()
 {
+  if (m_rrType != RR_NS) {
+    std::cout <<"Register Top: RRType ust be RR_NS" << std::endl;
+    return  false;
+  }
+
   ZoneMgr zoneMgr (m_zone);
   zoneMgr.setResultNum (0);
   zoneMgr.lookupId ();
@@ -71,6 +78,8 @@ ZoneRegister::doRegisterRoot ()
 
   RRSet rrset (m_zone);
   Name name = m_subZoneKSKSignedByDSKCert.getName (); //.getSubName(m_zone.getAuthorizedName().size() + 1);
+  name = name.getSubName(m_zone.getAuthorizedName().size(), name.size() - m_zone.getAuthorizedName().size());
+
   rrset.setLabel (name.toUri ());
   rrset.setClass ("NULL");
   rrset.setType (RR_ID_CERT);
@@ -91,10 +100,7 @@ ZoneRegister::doRegisterRoot ()
   RRMgr rrMgr;
   rrMgr.addRR (rr);
 
-  std::cout << "to insert rr: " << rr << std::endl;
   rrMgr.insert ();
-  std::cout << "after insert rr: " << rr << std::endl;
-
   m_rrs.push_back (rr);
 
   return true;
@@ -111,33 +117,26 @@ ZoneRegister::doRegisterZone ()
     return false;
   }
 
-  ZoneMgr subzoneMgr (m_subzone);
-  subzoneMgr.setResultNum (0);
-  subzoneMgr.lookupId ();
-  if (subzoneMgr.getResultNum () > 0) {
-    std::cout << "The subzone: " << m_subzone << " already exist in the database" << std::endl;
-    return false;
-  }
-  std::cout << "to insert zone: " << m_subzone << std::endl;
-  subzoneMgr.insert ();
-  std::cout << "after insert zone: " << m_subzone << std::endl;
-
   RRSetMgr rrsetMgr;
   RRMgr rrMgr;
 
   RRSet rrset (m_zone);
-  Name name = m_subZoneKSKSignedByDSKCert.getName (); //.getSubName(m_zone.getAuthorizedName().size() + 2);
+  Name name = m_subZoneKSKSignedByDSKCert.getName (); //.getSubName(m_zone.getAuthorizedName().size() + 1);
+  name = name.getSubName(m_zone.getAuthorizedName().size(), name.size() - m_zone.getAuthorizedName().size());
+
   rrset.setLabel (name.toUri ());
   rrset.setClass ("NULL");
   rrset.setType (RR_ID_CERT);
   rrset.setNdndata ("NULL");
   rrsetMgr.addRRSet (rrset);
 
-  RRSet rrset2 (m_subzone);
+  RRSet rrset2 (m_zone);
   name = m_subzone.getAuthorizedName ().getSubName (m_zone.getAuthorizedName ().size ());
   rrset2.setLabel (name.toUri ());
   rrset2.setClass ("NULL");
-  rrset2.setType (RR_NS);
+  // could be NS, TXT
+  rrset2.setType (m_rrType);
+
   rrset2.setNdndata ("NULL");
 
   rrsetMgr.addRRSet (rrset2);

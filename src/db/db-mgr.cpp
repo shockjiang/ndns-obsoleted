@@ -177,7 +177,7 @@ DBMgr::callback_getInt (int argc, char **argv, char** azColNames)
 {
 
   this->m_tempInt = std::atoi (argv[0]);
-  std::cout << "return Int =" << this->m_tempInt << std::endl;
+  //std::cout << "return Int =" << this->m_tempInt << std::endl;
   return 0;
 }
 int

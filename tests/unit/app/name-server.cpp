@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(AppNameServer)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {
-  string label = "nameServer::Protocol";
+  string label = "AppNameServer::Protocol";
   printbegin (label);
 
   Name name ("/DNS/net/NS");

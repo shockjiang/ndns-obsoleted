@@ -80,11 +80,12 @@ public:
   stop ()
   {
     std::cout << m_programName << " stops" << std::endl;
-    m_ioService.stop ();
-    m_face.shutdown ();
     if (hasError ()) {
       cout << m_error << endl;
     }
+
+    m_ioService.stop ();
+    m_face.shutdown ();
   }
 
   bool

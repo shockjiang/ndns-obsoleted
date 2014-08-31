@@ -134,10 +134,10 @@ private:
 inline std::ostream&
 operator<< (std::ostream& os, const RRSet& rrset)
 {
-  os << "RRSet: Id=" << rrset.getId () << " Zone="
-     << rrset.getZone ().getAuthorizedName ().toUri ();
-  os << " Label=" << rrset.getLabel ().toUri() << " Type=" << toString (rrset.getType ());
-  os << " Class=" << rrset.getClass ();
+  os << "RRSet: Id=" << rrset.getId ()
+     << " Zone=(" << rrset.getZone() << ")"
+     << " Label=" << rrset.getLabel ().toUri()
+     << " Type=" << toString (rrset.getType ());
   return os;
 }
 

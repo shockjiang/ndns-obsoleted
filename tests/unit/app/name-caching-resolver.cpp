@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_SUITE(AppNameCachingResolver)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {
-  string label = "nameCachingResolver::Protocol";
+  string label = "AppNameCachingResolver::Protocol";
   printbegin (label);
 
   Name name = "/DNS-R/net/ndnsim/www/TXT";

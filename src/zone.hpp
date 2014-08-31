@@ -74,7 +74,9 @@ private:
 inline std::ostream&
 operator<< (std::ostream& os, const Zone& zone)
 {
-  os << "Zone: Id=" << zone.getId () << " Name=" << zone.getAuthorizedName ().toUri ();
+  os << "Zone: Id=" << zone.getId ()
+     << " Name=" << zone.getAuthorizedName ().toUri ()
+     << "";
   return os;
 }
 

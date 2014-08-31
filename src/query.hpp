@@ -49,6 +49,9 @@ public:
   virtual bool
   fromInterest (const Interest& interest);
 
+  virtual bool
+  fromInterest (const Interest& interest, std::map<std::string, std::string>& map);
+
   ///////////////////////////////////////////////////////////
 
   const Name&
@@ -140,8 +143,9 @@ public:
 inline std::ostream&
 operator<< (std::ostream& os, const Query& query)
 {
-  os << "Query: authorityZone=" << query.getAuthorityZone ().toUri () << " queryType="
-     << toString (query.getQueryType ()) << " rrLabel=" << query.getRrLabel ().toUri ()
+  os << "Query: authorityZone=(" << query.getAuthorityZone ().toUri () << ")"
+     << " queryType=" << toString (query.getQueryType ())
+     << " rrLabel=" << query.getRrLabel ().toUri ()
      << " rrType=" << toString (query.getRrType ());
   return os;
 }

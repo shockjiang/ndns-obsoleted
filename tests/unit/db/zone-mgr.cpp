@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_SUITE(DbZoneMgr)
 
 BOOST_AUTO_TEST_CASE(db)
 {
-  string label = "zoneMgr::db";
+  string label = "DbZoneMgr::db";
   printbegin (label);
   Zone zone;
   zone.setAuthorizedName (Name ("/net"));

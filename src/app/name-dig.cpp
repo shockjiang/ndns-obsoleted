@@ -40,9 +40,8 @@ void
 NameDig::onData (const Interest& interest, Data& data)
 {
   Response re;
-  re.fromData (data);
-  cout << "get data:->" << data.getName () << endl;
-  cout << "get response:->" << re << endl;
+  re.fromData (data);//here rr.label is wrong since the label is derived from data name
+  std::cout << "[* -> *] get response: " << re << std::endl;
 
   response = re;
 
@@ -51,7 +50,8 @@ NameDig::onData (const Interest& interest, Data& data)
   vector<RR>::iterator iter = m_rrs.begin ();
 
   while (iter != m_rrs.end ()) {
-    RR rr = *iter;
+    RR& rr = *iter;
+    rr.setLabel(rr.getRrset().getLabel().getSubName(rr.getZone().getAuthorizedName().size()));
     cout << rr << endl;
     iter++;
   }
@@ -59,8 +59,11 @@ NameDig::onData (const Interest& interest, Data& data)
   this->stop ();
 }
 
-void
-NameDig::sendQuery ()
+/**
+ * @brief construct a query (interest) which contains the update information
+ */
+Interest
+NameDig::toInterest ()
 {
   Query q;
   q.setAuthorityZone (this->m_resolverName);
@@ -70,6 +73,22 @@ NameDig::sendQuery ()
 
   Interest interest = q.toInterest ();
   interest.setInterestLifetime (this->m_interestLifetime);
+  //interest.setMustBeFresh(true);
+  return interest;
+}
+
+void
+NameDig::sendQuery ()
+{
+  Interest interest = this->toInterest();
+  interest.setInterestLifetime(this->m_interestLifetime);
+
+  this->sendQuery(interest);
+}
+
+void
+NameDig::sendQuery (Interest& interest)
+{
   try {
     m_face.expressInterest (interest, boost::bind (&NameDig::onData, this, _1, _2),
                             boost::bind (&NameDig::onTimeout, this, _1));
@@ -78,9 +97,12 @@ NameDig::sendQuery ()
   catch (std::exception& e) {
     m_hasError = true;
     m_error = e.what ();
+    std::cout << "Fail to send Interest: " << m_error << std::endl;
   }
   m_interestTriedNum += 1;
 }
+
+
 
 void
 NameDig::onTimeout (const Interest& interest)

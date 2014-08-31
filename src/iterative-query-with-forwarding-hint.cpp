@@ -67,22 +67,25 @@ IterativeQueryWithForwardingHint::doData (Data& data)
       //In fact, there are two different situations
       //1st: /net/ndnsim/DNS/www/NS is nacked
       //2st: /net/DNS/ndnsim/www/NS is nacked
-      m_step = QUERY_STEP_RRQuery;
-
-      if (m_query.getRrType () == RR_ID_CERT && m_rrLabelLen == 1) {
-        //here working for KSK and ID-CERT when get a Nack
-        //e.g., /net/ndnsim/ksk-1, ksk-1 returns nack, but it should query /net
-
-        Name dstLabel = m_query.getRrLabel ();
-        Name label = dstLabel.getSubName (m_finishedLabelNum, m_rrLabelLen);
-        if (boost::starts_with (label.toUri (), "/ksk-")
-          || boost::starts_with (label.toUri (), "/KSK-")) {
-          m_finishedLabelNum = m_lastFinishedLabelNum;
-          m_forwardingHint = m_lastForwardingHint;
-        }
-
+      if (m_query.getRrType() == RR_NS) {
+        m_step = QUERY_STEP_AnswerStub;
       }
-    }
+//      else if (m_query.getRrType () == RR_ID_CERT && m_rrLabelLen == 1) {
+//        //here working for KSK and ID-CERT when get a Nack
+//        //e.g., /net/ndnsim/ksk-1, ksk-1 returns nack, but it should query /net
+//
+//        Name dstLabel = m_query.getRrLabel ();
+//        Name label = dstLabel.getSubName (m_finishedLabelNum, m_rrLabelLen);
+//        if (boost::starts_with (label.toUri (), "/ksk-")
+//          || boost::starts_with (label.toUri (), "/KSK-")) {
+//          m_finishedLabelNum = m_lastFinishedLabelNum;
+//          m_forwardingHint = m_lastForwardingHint;
+//        }
+//      }
+      else {
+        m_step = QUERY_STEP_RRQuery;
+      }
+    }// fi(NSQuery after geting Nack)
     else if (m_step == QUERY_STEP_RRQuery) {
       m_step = QUERY_STEP_AnswerStub;
     }
@@ -102,6 +105,10 @@ IterativeQueryWithForwardingHint::doData (Data& data)
       //std::cout<<"step 3"<<std::endl;
       m_lastResponse = re;
       //std::cout<<"step 4"<<std::endl;
+
+      if (m_query.getRrType() == RR_NS && m_finishedLabelNum == m_query.getRrLabel().size()) {
+        m_step = QUERY_STEP_AnswerStub;
+      }
     }
     else if (m_step == QUERY_STEP_FHQuery) {
       m_step = QUERY_STEP_NSQuery;

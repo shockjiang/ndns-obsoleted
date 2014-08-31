@@ -37,6 +37,7 @@
 #include "ndns-tlv.hpp"
 #include "ndns-enum.hpp"
 #include "ndns-label.hpp"
+#include "util/common.hpp"
 #include "rr.hpp"
 
 namespace ndn {
@@ -64,8 +65,8 @@ public:
   wireDecode (const Block& wire);
 
   template<bool T>
-    size_t
-    wireEncode (EncodingImpl<T> & block) const;
+  size_t
+  wireEncode (EncodingImpl<T> & block) const;
 
   void
   fromData (const Name& name, const Data& data);
@@ -80,13 +81,12 @@ public:
   getStringRRs () const
   {
     std::stringstream str;
-    str << "[";
+
     std::vector<RR>::const_iterator iter = m_rrs.begin ();
     while (iter != m_rrs.end ()) {
-      str << " " << *iter;
+      str << "{" << *iter << "}";
       iter++;
     }
-    str << "]";
     return str.str ();
   }
 
@@ -157,9 +157,11 @@ public:
     while (iter != m_rrs.end()) {
       RR& rr = *iter;
       rr.setZone(zone);
+      iter++;
+      std::cout << rr << std::endl;
     }
   }
-private:
+protected:
   time::milliseconds m_freshness;
   /*
    * this is the whole name of the response.
@@ -186,18 +188,10 @@ private:
 inline std::ostream&
 operator<< (std::ostream& os, const Response& response)
 {
-  os << "Response: queryName=" << response.getQueryName ().toUri () << " responseType="
-     << toString (response.getResponseType ()) << " queryType="
-     << toString (response.getQueryType ()) << " [";
-
-  std::vector<RR>::const_iterator iter = response.getRrs ().begin ();
-  while (iter != response.getRrs ().end ()) {
-    os << " " << *iter;
-    iter++;
-  }
-
-  os << "]";
-
+  os << "Response: queryName=" << toNameDigest(response.getQueryName ().toUri ())
+    << " responseType=" << toString (response.getResponseType ())
+    << " queryType=" << toString (response.getQueryType ())
+    << " rrs=>" << response.getStringRRs() << "<";
   return os;
 }
 

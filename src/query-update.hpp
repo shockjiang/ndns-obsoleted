@@ -49,6 +49,8 @@ public:
   bool
   fromInterest (const Interest& interest);
 
+  bool
+  fromInterest (const Interest& interest, std::map<std::string, std::string>& map);
 
   void
   setUpdateRrs(const std::vector<RR>& rrs)
@@ -84,9 +86,11 @@ private:
 inline std::ostream&
 operator<< (std::ostream& os, const QueryUpdate& update)
 {
-  os << "QueryUpdate: authorityZone=" << update.getAuthorityZone ().toUri () << " queryType="
-     << toString (update.getQueryType ()) << " Update=" << update.getUpdate()
-     << " rrType=" << toString (update.getRrType ());
+  os << "QueryUpdate: authorityZone=(" << update.getAuthorityZone ().toUri () <<")"
+     << " queryType=" << toString (update.getQueryType ())
+     << " rrType=" << toString (update.getRrType ())
+     << " Update=$" << update.getUpdate() << "$";
+
   return os;
 }
 

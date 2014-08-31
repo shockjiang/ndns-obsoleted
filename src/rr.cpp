@@ -80,6 +80,17 @@ RR::wireDecode (const Block& wire)
     throw Tlv::Error ("not the RRDataSub1 Type");
   }
 
+  if (it != m_wire.elements_end () && it->type () == ndn::ndns::tlv::RRZone) {
+    Name name(std::string (reinterpret_cast<const char*> (it->value ()), it->value_size ()));
+    //name.wireDecode(*it);
+    this->setZone(name);
+    it++;
+  }
+  else {
+    throw Tlv::Error ("not the RRZone Type");
+  }
+
+
   if (it != m_wire.elements_end () && it->type () == ndn::ndns::tlv::RRDataRecord) {
 
     m_rrData = std::string (reinterpret_cast<const char*> (it->value ()), it->value_size ());
