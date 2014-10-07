@@ -7,3 +7,10 @@ design of NDNS was primarily driven with a desire to provide support for cryptog
 distribution and routing scalability management, we believe that NDNS can also serve a
 number of other purposes during the development and deployment of the NDN architecture in
 coming years.
+
+
+
+Now we have new design, and this one is out-dated. So we will not update code here any more.
+
+   Xiaoke Jiang
+   Oct 6, 2014
