@@ -22,63 +22,63 @@
 namespace ndn {
 namespace ndns {
 
-NameDig::NameDig (const char *programName, const char *prefix)
-  : NDNApp (programName, prefix)
-  , m_resolverName (Name ("/"))
-  , m_dstLabel (Name (prefix))
-  , m_rrType (RR_TXT)
+NameDig::NameDig(const char *programName, const char *prefix)
+  : NDNApp(programName, prefix),
+    m_resolverName(Name("/")),
+    m_dstLabel(Name(prefix)),
+    m_rrType(RR_TXT)
 {
   //prefix in this app is the m_dstLabel
-  this->setInterestLifetime (time::milliseconds (10000));
+  this->setInterestLifetime(time::milliseconds(10000));
 }
 
-NameDig::~NameDig ()
+NameDig::~NameDig()
 {
 }
 
 void
-NameDig::onData (const Interest& interest, Data& data)
+NameDig::onData(const Interest& interest, Data& data)
 {
   Response re;
-  re.fromData (data);//here rr.label is wrong since the label is derived from data name
+  re.fromData(data); //here rr.label is wrong since the label is derived from data name
   std::cout << "[* -> *] get response: " << re << std::endl;
 
   response = re;
 
-  m_rrs = re.getRrs ();
+  m_rrs = re.getRrs();
 
-  vector<RR>::iterator iter = m_rrs.begin ();
+  vector<RR>::iterator iter = m_rrs.begin();
 
-  while (iter != m_rrs.end ()) {
+  while (iter != m_rrs.end()) {
     RR& rr = *iter;
     rr.setLabel(rr.getRrset().getLabel().getSubName(rr.getZone().getAuthorizedName().size()));
     cout << rr << endl;
     iter++;
   }
 
-  this->stop ();
+  this->stop();
 }
 
 /**
  * @brief construct a query (interest) which contains the update information
  */
 Interest
-NameDig::toInterest ()
+NameDig::toInterest()
 {
   Query q;
-  q.setAuthorityZone (this->m_resolverName);
-  q.setRrLabel (m_dstLabel);
-  q.setQueryType (QUERY_DNS_R);
-  q.setRrType (m_rrType);
+  q.setAuthorityZone(this->m_resolverName);
+  q.setRrLabel(m_dstLabel);
+  q.setQueryType(QUERY_DNS_R);
+  q.setRrType(m_rrType);
 
-  Interest interest = q.toInterest ();
-  interest.setInterestLifetime (this->m_interestLifetime);
+  Interest interest = q.toInterest();
+  interest.setInterestLifetime(this->m_interestLifetime);
   //interest.setMustBeFresh(true);
   return interest;
 }
 
 void
-NameDig::sendQuery ()
+NameDig::sendQuery()
 {
   Interest interest = this->toInterest();
   interest.setInterestLifetime(this->m_interestLifetime);
@@ -87,52 +87,50 @@ NameDig::sendQuery ()
 }
 
 void
-NameDig::sendQuery (Interest& interest)
+NameDig::sendQuery(Interest& interest)
 {
   try {
-    m_face.expressInterest (interest, boost::bind (&NameDig::onData, this, _1, _2),
-                            boost::bind (&NameDig::onTimeout, this, _1));
-    std::cout << "[* <- *] send Interest: " << interest.getName ().toUri () << std::endl;
+    m_face.expressInterest(interest, boost::bind(&NameDig::onData, this, _1, _2),
+                           boost::bind(&NameDig::onTimeout, this, _1));
+    std::cout << "[* <- *] send Interest: " << interest.getName().toUri() << std::endl;
   }
   catch (std::exception& e) {
     m_hasError = true;
-    m_error = e.what ();
+    m_error = e.what();
     std::cout << "Fail to send Interest: " << m_error << std::endl;
   }
   m_interestTriedNum += 1;
 }
 
-
-
 void
-NameDig::onTimeout (const Interest& interest)
+NameDig::onTimeout(const Interest& interest)
 {
-  std::cout << "[* !! *] timeout Interest" << interest.getName () << std::endl;
+  std::cout << "[* !! *] timeout Interest" << interest.getName() << std::endl;
 
   if (m_interestTriedNum >= m_interestTriedMax) {
     m_error = "All Interests timeout";
     m_hasError = true;
-    this->stop ();
+    this->stop();
   }
   else {
-    sendQuery ();
+    sendQuery();
   }
 
 }
 
 void
-NameDig::run ()
+NameDig::run()
 {
 
-  this->sendQuery ();
+  this->sendQuery();
 
   try {
-    m_face.processEvents ();
+    m_face.processEvents();
   }
   catch (std::exception& e) {
-    m_error = e.what ();
+    m_error = e.what();
     m_hasError = true;
-    this->stop ();
+    this->stop();
   }
 
 }

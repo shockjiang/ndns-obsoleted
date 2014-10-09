@@ -29,16 +29,16 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(IterativeQuery)
+BOOST_AUTO_TEST_SUITE (IterativeQuery)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {
   string label = "IterativeQuery::Protocol";
-  printbegin (label);
+  printbegin(label);
 
   Query q;
 
-  printend (label);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

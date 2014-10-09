@@ -49,23 +49,23 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(AppNameCachingResolver)
+BOOST_AUTO_TEST_SUITE (AppNameCachingResolver)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {
   string label = "AppNameCachingResolver::Protocol";
-  printbegin (label);
+  printbegin(label);
 
   Name name = "/DNS-R/net/ndnsim/www/TXT";
   Interest interest;
-  interest.setName (name);
+  interest.setName(name);
 
-  NameCachingResolver<IterativeQueryWithForwardingHint> resolver ("resolver", "/DNS-R");
+  NameCachingResolver<IterativeQueryWithForwardingHint> resolver("resolver", "/DNS-R");
   cout << "onInterest" << endl;
   //keepResolver must be set to false, or it will try to send Interest without building a face previously
-  resolver.onInterest (name, interest, false);
+  resolver.onInterest(name, interest, false);
   cout << "after onInterest" << endl;
-  printend (label);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

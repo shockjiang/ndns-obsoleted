@@ -30,35 +30,35 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(DbQueryMgr)
+BOOST_AUTO_TEST_SUITE (DbQueryMgr)
 
 BOOST_AUTO_TEST_CASE(db)
 {
 
   string label = "DbQueryMgr::db";
-  printbegin (label);
+  printbegin(label);
 
   ndns::Query q;
-  Name n1 ("/net");
-  Name n2 ("/ndnsim");
-  q.setAuthorityZone (n1);
-  q.setRrLabel (n2);
-  q.setQueryType (QUERY_DNS_R);
+  Name n1("/net");
+  Name n2("/ndnsim");
+  q.setAuthorityZone(n1);
+  q.setRrLabel(n2);
+  q.setQueryType(QUERY_DNS_R);
 
   Zone zone;
-  zone.setAuthorizedName (Name ("/net"));
-  zone.setId (2);
+  zone.setAuthorizedName(Name("/net"));
+  zone.setId(2);
 
   Response re;
 
-  QueryMgr mgr (zone, q, re);
-  mgr.lookup ();
+  QueryMgr mgr(zone, q, re);
+  mgr.lookup();
 
-  zone.setId (23);
-  QueryMgr mgr2 (zone, q, re);
-  mgr2.lookup ();
+  zone.setId(23);
+  QueryMgr mgr2(zone, q, re);
+  mgr2.lookup();
 
-  printend (label);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

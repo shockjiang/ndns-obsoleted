@@ -34,23 +34,23 @@ namespace ndns {
 class QueryUpdate : public Query
 {
 public:
-  QueryUpdate ();
+  QueryUpdate();
   virtual
-  ~QueryUpdate ();
+  ~QueryUpdate();
 
   using Query::toInterest;
   virtual Interest
-  toInterest (KeyChain& keyChain);
+  toInterest(KeyChain& keyChain);
 
   using Query::fromInterest;
   bool
-  fromInterest (const Name &name, const Interest& interest);
+  fromInterest(const Name &name, const Interest& interest);
 
   bool
-  fromInterest (const Interest& interest);
+  fromInterest(const Interest& interest);
 
   bool
-  fromInterest (const Interest& interest, std::map<std::string, std::string>& map);
+  fromInterest(const Interest& interest, std::map<std::string, std::string>& map);
 
   void
   setUpdateRrs(const std::vector<RR>& rrs)
@@ -59,13 +59,13 @@ public:
   }
 
   const Response&
-  getUpdate () const
+  getUpdate() const
   {
     return m_update;
   }
 
   void
-  setUpdate (const Response& update)
+  setUpdate(const Response& update)
   {
     m_update = update;
   }
@@ -76,7 +76,6 @@ public:
     m_update.setRrZones(zone);
   }
 
-
 private:
   Response m_update;
   Block m_wiredUpdate;
@@ -84,12 +83,11 @@ private:
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const QueryUpdate& update)
+operator<<(std::ostream& os, const QueryUpdate& update)
 {
-  os << "QueryUpdate: authorityZone=(" << update.getAuthorityZone ().toUri () <<")"
-     << " queryType=" << toString (update.getQueryType ())
-     << " rrType=" << toString (update.getRrType ())
-     << " Update=$" << update.getUpdate() << "$";
+  os << "QueryUpdate: authorityZone=(" << update.getAuthorityZone().toUri() << ")" << " queryType="
+     << toString(update.getQueryType()) << " rrType=" << toString(update.getRrType()) << " Update=$"
+     << update.getUpdate() << "$";
 
   return os;
 }

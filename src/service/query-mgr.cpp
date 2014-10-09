@@ -22,67 +22,67 @@
 namespace ndn {
 namespace ndns {
 
-QueryMgr::QueryMgr (Zone& zone, Query& query, Response& response)
-  : m_zone (zone)
-  , m_query (query)
-  , m_response (response)
-  , m_rrset (m_zone)
+QueryMgr::QueryMgr(Zone& zone, Query& query, Response& response)
+  : m_zone(zone),
+    m_query(query),
+    m_response(response),
+    m_rrset(m_zone)
 {
 }
 
-QueryMgr::~QueryMgr ()
+QueryMgr::~QueryMgr()
 {
 }
 
 int
-QueryMgr::hasAuth ()
+QueryMgr::hasAuth()
 {
   std::string sql;
   sql = "SELECT count(*) FROM rrs INNER JOIN rrsets ON rrs.rrset_id=rrsets.id";
   sql += " WHERE rrsets.zone_id=";
-  sql += std::to_string (m_zone.getId ());
+  sql += std::to_string(m_zone.getId());
   sql += " AND ";
   sql += "rrsets.type=\'";
-  sql += toString (m_query.getRrType ());
+  sql += toString(m_query.getRrType());
   sql += "\' AND ";
   sql += "rrsets.label LIKE \'";
-  sql += m_query.getRrLabel ().toUri () + "/%\'";
+  sql += m_query.getRrLabel().toUri() + "/%\'";
 
   this->setTempInt(0);
-  this->execute (sql, static_callback_getInt, this);
+  this->execute(sql, static_callback_getInt, this);
 
   return this->m_tempInt;
 }
 
 void
-QueryMgr::lookup ()
+QueryMgr::lookup()
 {
-  m_rrset.setLabel (m_query.getRrLabel ().toUri ());
-  m_rrset.setType (m_query.getRrType ());
+  m_rrset.setLabel(m_query.getRrLabel().toUri());
+  m_rrset.setType(m_query.getRrType());
 
-  m_rrsetMgr.addRRSet (m_rrset);
-  m_rrsetMgr.lookupIds ();
+  m_rrsetMgr.addRRSet(m_rrset);
+  m_rrsetMgr.lookupIds();
 
   std::string sql;
 
   sql = "SELECT id, ttl, rrdata FROM rrs WHERE rrset_id=";
-  sql += std::to_string (m_rrset.getId ());
+  sql += std::to_string(m_rrset.getId());
   sql += " ORDER BY id";
 
-  this->execute (sql, static_callback_getRr, this);
+  this->execute(sql, static_callback_getRr, this);
 
-  m_response.setRrs (m_rrs);
+  m_response.setRrs(m_rrs);
 }
 
 int
-QueryMgr::callback_getRr (int argc, char** argv, char** azColName)
+QueryMgr::callback_getRr(int argc, char** argv, char** azColName)
 {
-  RR rr (m_rrset);
-  rr.setId (std::atoi (argv[0]));
-  rr.setTtl (std::atoi (argv[1]));
-  rr.setRrData (argv[2]);
+  RR rr(m_rrset);
+  rr.setId(std::atoi(argv[0]));
+  rr.setTtl(std::atoi(argv[1]));
+  rr.setRrData(argv[2]);
 
-  this->addRR (rr);
+  this->addRR(rr);
   return 0;
 }
 

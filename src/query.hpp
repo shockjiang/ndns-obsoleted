@@ -34,99 +34,97 @@ namespace ndns {
 class Query
 {
 public:
-  Query ();
+  Query();
 
   virtual
-  ~Query ();
+  ~Query();
 
 public:
   virtual Interest
-  toInterest () const;
+  toInterest() const;
 
   virtual bool
-  fromInterest (const Name &name, const Interest& interest);
+  fromInterest(const Name &name, const Interest& interest);
 
   virtual bool
-  fromInterest (const Interest& interest);
+  fromInterest(const Interest& interest);
 
   virtual bool
-  fromInterest (const Interest& interest, std::map<std::string, std::string>& map);
+  fromInterest(const Interest& interest, std::map<std::string, std::string>& map);
 
   ///////////////////////////////////////////////////////////
 
   const Name&
-  getAuthorityZone () const
+  getAuthorityZone() const
   {
     return m_authorityZone;
   }
 
   void
-  setAuthorityZone (const Name& authorityZone)
+  setAuthorityZone(const Name& authorityZone)
   {
     m_authorityZone = authorityZone;
   }
 
   time::milliseconds
-  getInterestLifetime () const
+  getInterestLifetime() const
   {
     return m_interestLifetime;
   }
 
   void
-  setInterestLifetime (time::milliseconds interestLifetime)
+  setInterestLifetime(time::milliseconds interestLifetime)
   {
     m_interestLifetime = interestLifetime;
   }
 
   enum QueryType
-  getQueryType () const
+  getQueryType() const
   {
     return m_queryType;
   }
 
   void
-  setQueryType (enum QueryType queryType)
+  setQueryType(enum QueryType queryType)
   {
     m_queryType = queryType;
   }
 
   const Name&
-  getRrLabel () const
+  getRrLabel() const
   {
     return m_rrLabel;
   }
 
   void
-  setRrLabel (const Name& rrLabel)
+  setRrLabel(const Name& rrLabel)
   {
     m_rrLabel = rrLabel;
   }
 
   const RRType&
-  getRrType () const
+  getRrType() const
   {
     return m_rrType;
   }
 
   void
-  setRrType (const RRType& rrType)
+  setRrType(const RRType& rrType)
   {
     m_rrType = rrType;
   }
 
-
   const Name&
-  getFowardingHint () const
+  getFowardingHint() const
   {
     return m_forwardingHint;
   }
 
   void
-  setFowardingHint (const Name& fowardingHint)
+  setFowardingHint(const Name& fowardingHint)
   {
     m_forwardingHint = fowardingHint;
   }
-
 
 public:
   Name m_authorityZone;
@@ -141,12 +139,11 @@ public:
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const Query& query)
+operator<<(std::ostream& os, const Query& query)
 {
-  os << "Query: authorityZone=(" << query.getAuthorityZone ().toUri () << ")"
-     << " queryType=" << toString (query.getQueryType ())
-     << " rrLabel=" << query.getRrLabel ().toUri ()
-     << " rrType=" << toString (query.getRrType ());
+  os << "Query: authorityZone=(" << query.getAuthorityZone().toUri() << ")" << " queryType="
+     << toString(query.getQueryType()) << " rrLabel=" << query.getRrLabel().toUri() << " rrType="
+     << toString(query.getRrType());
   return os;
 }
 

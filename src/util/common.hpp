@@ -24,22 +24,23 @@
 #include <string>
 #include <ndn-cxx/name.hpp>
 
-inline std::string toNameDigest(std::string str, int prefixLen=30, int surfixLen=30) {
+inline std::string
+toNameDigest(std::string str, int prefixLen = 30, int surfixLen = 30)
+{
   std::string str2 = str;
   int len = str.size();
   if (len > prefixLen + surfixLen) {
-    str2 = str.substr(0, prefixLen) + "..." + str.substr(len-surfixLen, surfixLen);
+    str2 = str.substr(0, prefixLen) + "..." + str.substr(len - surfixLen, surfixLen);
   }
 
   return str2;
 }
 
-inline std::string toNameDigest(ndn::Name name, int prefixLen=30, int surfixLen=30) {
+inline std::string
+toNameDigest(ndn::Name name, int prefixLen = 30, int surfixLen = 30)
+{
   std::string str2 = name.toUri();
   return toNameDigest(str2, prefixLen, surfixLen);
 }
-
-
-
 
 #endif

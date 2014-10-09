@@ -29,15 +29,17 @@ namespace ndn {
 namespace ndns {
 namespace label {
 const std::string ForwardingHintLabel = "\xF0.";
-const ndn::Name::Component ForwardingHintComp (ForwardingHintLabel);
-const ndn::Name::Component QueryDNSComp ("DNS");
-const ndn::Name::Component QueryDNSRComp ("DNS-R");
+const ndn::Name::Component ForwardingHintComp(ForwardingHintLabel);
+const ndn::Name::Component QueryDNSComp("DNS");
+const ndn::Name::Component QueryDNSRComp("DNS-R");
 
 const std::regex DNS_QUERY_NAME_REGEX("((/.*)%F0\\.)?(/.*)/?(DNS)(/.*)/(FH|TXT|NS|ID-CERT)(.*)");
 const std::regex QUERY_NAME_REGEX("((/.*)%F0\\.)?(/.*)/?(DNS-R|DNS)(/.*)/(FH|TXT|NS|ID-CERT)(.*)");
 const std::regex UPDATE_NAME_REGEX("((/.*)%F0\\.)?(/.*)/?(DNS)(/.*)/(DYNDNSUPDATE)(.*)");
 
-inline bool matchQueryName(const std::string& str, std::map<std::string, std::string>& map) {
+inline bool
+matchQueryName(const std::string& str, std::map<std::string, std::string>& map)
+{
   std::match_results<std::string::const_iterator> results;
 
   if (std::regex_match(str, results, QUERY_NAME_REGEX)) {
@@ -60,7 +62,9 @@ inline bool matchQueryName(const std::string& str, std::map<std::string, std::st
  * @brief this function does not match the query's name which contains the response
  * instead, it match the inner update (response)'s name
  */
-inline bool matchUpdateName(const std::string& str, std::map<std::string, std::string>& map) {
+inline bool
+matchUpdateName(const std::string& str, std::map<std::string, std::string>& map)
+{
   std::match_results<std::string::const_iterator> results;
 
   if (std::regex_match(str, results, UPDATE_NAME_REGEX)) {
@@ -77,8 +81,7 @@ inline bool matchUpdateName(const std::string& str, std::map<std::string, std::s
   return false;
 }
 
-
-}// namespace label
+}    // namespace label
 } // namespace ndns
 } // namespace ndn
 #endif

@@ -39,166 +39,167 @@ namespace ndns {
 class NDNApp
 {
 public:
-  NDNApp (const char *programName, const char *prefix);
+  NDNApp(const std::string& hint, const std::string& prefix, const std::string certName,);
   virtual
-  ~NDNApp ();
+  ~NDNApp();
 
   virtual void
-  onData (const ndn::Interest& interest, Data& data)
+  onData(const ndn::Interest& interest, Data& data)
   {
   }
   virtual void
-  onTimeout (const ndn::Interest& interest)
+  onTimeout(const ndn::Interest& interest)
   {
-    std::cout << "!- Interest Timeout" << interest.getName () << std::endl;
+    std::cout << "!- Interest Timeout" << interest.getName() << std::endl;
   }
 
   virtual void
-  onRegisterFailed (const ndn::Name& prefix, const std::string& reason)
+  onRegisterFailed(const ndn::Name& prefix, const std::string& reason)
   {
     m_error = "ERROR: Failed to register prefix in local hub's daemon";
     m_error += " due to: ";
     m_error += reason;
     m_hasError = true;
-    this->stop ();
+    this->stop();
   }
 
   virtual void
-  onInterest (const Name &name, const Interest& interest)
+  onInterest(const Name &name, const Interest& interest)
   {
 
   }
 
   virtual void
-  signalHandler ()
+  signalHandler()
   {
-    this->stop ();
-    exit (1);
+    this->stop();
+    exit(1);
   }
 
   virtual void
-  stop ()
+  stop()
   {
     std::cout << m_programName << " stops" << std::endl;
-    if (hasError ()) {
+    if (hasError()) {
       cout << m_error << endl;
     }
 
-    m_ioService.stop ();
-    m_face.shutdown ();
+    m_ioService.stop();
+    m_face.shutdown();
   }
 
   bool
-  hasError () const
+  hasError() const
   {
     return m_hasError;
   }
 
   void
-  setHasError (bool hasError)
+  setHasError(bool hasError)
   {
     m_hasError = hasError;
   }
 
   const char*
-  getPrefix () const
+  getPrefix() const
   {
     return m_prefix;
   }
 
   void
-  setPrefix (char* prefix)
+  setPrefix(char* prefix)
   {
     m_prefix = prefix;
   }
 
   const char*
-  getProgramName () const
+  getProgramName() const
   {
     return m_programName;
   }
 
   void
-  setProgramName (char* programName)
+  setProgramName(char* programName)
   {
     m_programName = programName;
   }
 
   const string&
-  getErr () const
+  getErr() const
   {
     return m_error;
   }
 
   void
-  setErr (const string& err)
+  setErr(const string& err)
   {
     m_error = err;
   }
 
   uint32_t
-  getInterestTriedMax () const
+  getInterestTriedMax() const
   {
     return m_interestTriedMax;
   }
 
   void
-  setInterestTriedMax (uint32_t interestTriedMax)
+  setInterestTriedMax(uint32_t interestTriedMax)
   {
     m_interestTriedMax = interestTriedMax;
   }
 
   time::milliseconds
-  getContentFreshness () const
+  getContentFreshness() const
   {
     return m_contentFreshness;
   }
 
   void
-  setContentFreshness (time::milliseconds contentFreshness)
+  setContentFreshness(time::milliseconds contentFreshness)
   {
     m_contentFreshness = contentFreshness;
   }
 
   time::milliseconds
-  getInterestLifetime () const
+  getInterestLifetime() const
   {
     return m_interestLifetime;
   }
 
   void
-  setInterestLifetime (time::milliseconds interestLifetime)
+  setInterestLifetime(time::milliseconds interestLifetime)
   {
     m_interestLifetime = interestLifetime;
   }
 
   const Name&
-  getForwardingHint () const
+  getForwardingHint() const
   {
     return m_forwardingHint;
   }
 
   void
-  setForwardingHint (const Name& forwardingHint)
+  setForwardingHint(const Name& forwardingHint)
   {
     m_forwardingHint = forwardingHint;
   }
 
   unsigned short
-  getEnableForwardingHint () const
+  getEnableForwardingHint() const
   {
     return m_enableForwardingHint;
   }
 
   void
-  setEnableForwardingHint (unsigned short enableForwardingHint)
+  setEnableForwardingHint(unsigned short enableForwardingHint)
   {
     m_enableForwardingHint = enableForwardingHint;
   }
 
 protected:
   const char* m_programName;
-  const char* m_prefix;bool m_hasError;
+  const char* m_prefix;
+  bool m_hasError;
   string m_error;
   time::milliseconds m_contentFreshness;
   time::milliseconds m_interestLifetime;

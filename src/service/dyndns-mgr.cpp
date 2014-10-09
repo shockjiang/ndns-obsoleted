@@ -22,22 +22,21 @@
 namespace ndn {
 namespace ndns {
 
-DyndnsMgr::DyndnsMgr (Zone& zone, Response& re, QueryUpdate& queryUpdate)
-  : m_zone (zone)
-  , m_response(re)
-  , m_queryUpdate (queryUpdate)
+DyndnsMgr::DyndnsMgr(Zone& zone, Response& re, QueryUpdate& queryUpdate)
+  : m_zone(zone),
+    m_response(re),
+    m_queryUpdate(queryUpdate)
 {
 }
 
-DyndnsMgr::~DyndnsMgr ()
+DyndnsMgr::~DyndnsMgr()
 {
 }
 
 void
-DyndnsMgr::update () throw()
+DyndnsMgr::update() throw ()
 {
   std::vector<RR> rrs = m_queryUpdate.getUpdate().getRrs();
-
 
   RR& rr = rrs[0];
   rr.setZone(m_zone);
@@ -56,7 +55,7 @@ DyndnsMgr::update () throw()
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_ADD) {
     if (rr.getId() != 0) {
-      ;// already there, no more ADD
+      ; // already there, no more ADD
     }
     else {
       if (rrset.getId() == 0) {
@@ -71,8 +70,10 @@ DyndnsMgr::update () throw()
     if (rr.getId() > 0) {
       std::cout << " to remove rr: " << rr << std::endl;
       rrMgr.remove();
-    } else {
-      std::cout << "rr.getId() == 0. do not have to remove" << std::endl;;
+    }
+    else {
+      std::cout << "rr.getId() == 0. do not have to remove" << std::endl;
+      ;
     }
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_REPLACE_ALL) {
@@ -88,21 +89,19 @@ DyndnsMgr::update () throw()
     rrMgr.insert();
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_REPLACE) {
-    throw std::runtime_error("Not support "+toString(rr.getUpdateAction()));
+    throw std::runtime_error("Not support " + toString(rr.getUpdateAction()));
   }
   else if (rr.getUpdateAction() == UPDATE_ACTION_UNKNOWN) {
-    throw std::runtime_error("Not support "+toString(rr.getUpdateAction()));
+    throw std::runtime_error("Not support " + toString(rr.getUpdateAction()));
   }
 
-
-  std::cout <<rr <<std::endl;
+  std::cout << rr << std::endl;
   m_queryUpdate.setUpdateRrs(rrs);
-
 
 }
 
 int
-DyndnsMgr::callback_update (int argc, char **argv, char **azColName)
+DyndnsMgr::callback_update(int argc, char **argv, char **azColName)
 {
 
   return 0;

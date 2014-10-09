@@ -49,27 +49,27 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(AppNameServer)
+BOOST_AUTO_TEST_SUITE (AppNameServer)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {
   string label = "AppNameServer::Protocol";
-  printbegin (label);
+  printbegin(label);
 
-  Name name ("/DNS/net/NS");
+  Name name("/DNS/net/NS");
   Interest interest;
-  interest.setName (name);
+  interest.setName(name);
 
   string program = "name-server-daemon";
   string prefix = "/";
 
-  const char* pro = program.c_str ();
-  const char * pre = prefix.c_str ();
-  NameServer server (pro, pre, pre);
+  const char* pro = program.c_str();
+  const char * pre = prefix.c_str();
+  NameServer server(pro, pre, pre);
 
   //server.onInterest (name, interest);
 
-  printend (label);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -31,7 +31,6 @@ enum
   ResponseNumberOfRRData = 133,
   RRData = 134,
 
-
   RRDataSub1 = 141,
   RRDataRecord = 142,
   RRUpdateAction = 143,

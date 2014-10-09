@@ -29,37 +29,37 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(DbZoneMgr)
+BOOST_AUTO_TEST_SUITE (DbZoneMgr)
 
 BOOST_AUTO_TEST_CASE(db)
 {
   string label = "DbZoneMgr::db";
-  printbegin (label);
+  printbegin(label);
   Zone zone;
-  zone.setAuthorizedName (Name ("/net"));
-  zone.setId (11);
+  zone.setAuthorizedName(Name("/net"));
+  zone.setId(11);
 
-  ZoneMgr mgr (zone); //the construction will lookup zone.id, /net's id is 2
-  mgr.lookupId (); //
-  BOOST_CHECK_EQUAL(mgr.getZone ().getId (), 2);
-  BOOST_CHECK_EQUAL(zone.getId (), 2);
+  ZoneMgr mgr(zone); //the construction will lookup zone.id, /net's id is 2
+  mgr.lookupId(); //
+  BOOST_CHECK_EQUAL(mgr.getZone().getId(), 2);
+  BOOST_CHECK_EQUAL(zone.getId(), 2);
 
-  zone.setId (11);
-  BOOST_CHECK_EQUAL(mgr.getZone ().getId (), 11);
+  zone.setId(11);
+  BOOST_CHECK_EQUAL(mgr.getZone().getId(), 11);
 
-  zone.setId (12);
-  BOOST_CHECK_EQUAL(mgr.getZone ().getId (), 12);
+  zone.setId(12);
+  BOOST_CHECK_EQUAL(mgr.getZone().getId(), 12);
 
-  mgr.lookupId ();
-  cout << "zone.name=" << mgr.getZone ().getAuthorizedName () << endl;
-  cout << "zone.id=" << mgr.getZone ().getId () << endl;
-  cout << "zone.id=" << mgr.getZone ().getId () << endl;
+  mgr.lookupId();
+  cout << "zone.name=" << mgr.getZone().getAuthorizedName() << endl;
+  cout << "zone.id=" << mgr.getZone().getId() << endl;
+  cout << "zone.id=" << mgr.getZone().getId() << endl;
   cout << "&zone=" << &zone << endl;
-  cout << "&mgr.getZone()" << &(mgr.getZone ()) << endl;
-  BOOST_CHECK_EQUAL(mgr.getZone ().getId (), 2);
-  BOOST_CHECK_EQUAL(zone.getId (), 2);
+  cout << "&mgr.getZone()" << & (mgr.getZone()) << endl;
+  BOOST_CHECK_EQUAL(mgr.getZone().getId(), 2);
+  BOOST_CHECK_EQUAL(zone.getId(), 2);
 
-  printend (label);
+  printend(label);
 }
 BOOST_AUTO_TEST_SUITE_END()
 

@@ -37,78 +37,78 @@ namespace ndns {
 class ZoneRegister
 {
 public:
-  ZoneRegister (Zone& zone, Zone& subzone, boost::shared_ptr<IdentityCertificate>& cert);
+  ZoneRegister(Zone& zone, Zone& subzone, boost::shared_ptr<IdentityCertificate>& cert);
 
-  ZoneRegister (Zone& zone, Zone& subzone, IdentityCertificate& cert);
+  ZoneRegister(Zone& zone, Zone& subzone, IdentityCertificate& cert);
 
   virtual
-  ~ZoneRegister ();
+  ~ZoneRegister();
 
   bool
-  tryRegister ();
+  tryRegister();
 
   bool
-  doRegisterTop ();
+  doRegisterTop();
 
   bool
-  doRegisterZone ();
+  doRegisterZone();
 
   const Zone&
-  getZone () const
+  getZone() const
   {
     return m_zone;
   }
 
   void
-  setZone (const Zone& zone)
+  setZone(const Zone& zone)
   {
     m_zone = zone;
   }
 
   const Zone&
-  getSubZone () const
+  getSubZone() const
   {
     return m_subzone;
   }
 
   const std::vector<RR>&
-  getRrs () const
+  getRrs() const
   {
     return m_rrs;
   }
 
   void
-  setRrs (const std::vector<RR>& rrs)
+  setRrs(const std::vector<RR>& rrs)
   {
     m_rrs = rrs;
   }
 
   const std::vector<std::string>&
-  getNsDatas () const
+  getNsDatas() const
   {
     return m_nsDatas;
   }
 
   void
-  setNsDatas (const std::vector<std::string>& nsDatas)
+  setNsDatas(const std::vector<std::string>& nsDatas)
   {
     m_nsDatas = nsDatas;
   }
 
   void
-  addNsData (const std::string& nsdata)
+  addNsData(const std::string& nsdata)
   {
-    m_nsDatas.push_back (nsdata);
+    m_nsDatas.push_back(nsdata);
   }
 
   RRType
-  getRrType () const
+  getRrType() const
   {
     return m_rrType;
   }
 
   void
-  setRrType (RRType rrType)
+  setRrType(RRType rrType)
   {
     m_rrType = rrType;
   }
@@ -139,13 +139,13 @@ private:
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const ZoneRegister& zg)
+operator<<(std::ostream& os, const ZoneRegister& zg)
 {
-  os << "Zone=[" << zg.getZone () << "] ";
-  os << "SubZone=[" << zg.getSubZone () << "] ";
+  os << "Zone=[" << zg.getZone() << "] ";
+  os << "SubZone=[" << zg.getSubZone() << "] ";
   os << "[";
-  std::vector<RR>::const_iterator iter = zg.getRrs ().begin ();
-  while (iter != zg.getRrs ().end ()) {
+  std::vector<RR>::const_iterator iter = zg.getRrs().begin();
+  while (iter != zg.getRrs().end()) {
     os << " " << *iter;
     iter++;
   }

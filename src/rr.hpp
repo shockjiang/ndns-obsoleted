@@ -37,18 +37,16 @@ namespace ndns {
 class RR
 {
 public:
-  RR (RRSet& rrset);
+  RR(RRSet& rrset);
 
-  RR ();
+  RR();
   virtual
-  ~RR ();
-
-
+  ~RR();
 
   inline bool
-  operator== (const RR& rr) const
+  operator==(const RR& rr) const
   {
-    if (this->getRrData () == rr.getRrData ())
+    if (this->getRrData() == rr.getRrData())
       return true;
 
     return false;
@@ -56,52 +54,51 @@ public:
 
   template<bool T>
     inline size_t
-    wireEncode (EncodingImpl<T> & block) const
+    wireEncode(EncodingImpl<T> & block) const
     {
-     size_t totalLength = 0;
+      size_t totalLength = 0;
 
-     std::string msg = toString(m_updateAction);
-     totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRUpdateAction,
-                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
-                                            msg.size ());
+      std::string msg = toString(m_updateAction);
+      totalLength += prependByteArrayBlock(block, ndn::ndns::tlv::RRUpdateAction,
+                                           reinterpret_cast<const uint8_t*>(msg.c_str()),
+                                           msg.size());
 
-     msg = this->getRrData ();
-     totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRDataRecord,
-                                            reinterpret_cast<const uint8_t*> (msg.c_str ()),
-                                            msg.size ());
+      msg = this->getRrData();
+      totalLength += prependByteArrayBlock(block, ndn::ndns::tlv::RRDataRecord,
+                                           reinterpret_cast<const uint8_t*>(msg.c_str()),
+                                           msg.size());
 
-     msg = this->getZone().getAuthorizedName().toUri();
-     totalLength += prependByteArrayBlock (block, ndn::ndns::tlv::RRZone,
-                                           reinterpret_cast<const uint8_t*> (msg.c_str ()),
-                                           msg.size ());
+      msg = this->getZone().getAuthorizedName().toUri();
+      totalLength += prependByteArrayBlock(block, ndn::ndns::tlv::RRZone,
+                                           reinterpret_cast<const uint8_t*>(msg.c_str()),
+                                           msg.size());
 
+      totalLength += prependNonNegativeIntegerBlock(block, ndn::ndns::tlv::RRDataSub1,
+                                                    this->getId());
 
-      totalLength += prependNonNegativeIntegerBlock (block, ndn::ndns::tlv::RRDataSub1,
-                                                     this->getId ());
-
-      totalLength += block.prependVarNumber (totalLength);
-      totalLength += block.prependVarNumber (ndn::ndns::tlv::RRData);
+      totalLength += block.prependVarNumber(totalLength);
+      totalLength += block.prependVarNumber(ndn::ndns::tlv::RRData);
       //std::cout<<"call rr.h wireEncode"<<std::endl;
       return totalLength;
     }
 
   const Block&
-  wireEncode () const;
+  wireEncode() const;
 
   void
-  wireDecode (const Block& wire);
+  wireDecode(const Block& wire);
 
   //////////////////////////////////////////////////////////////////
 public:
 
   void
-  setType (RRType type)
+  setType(RRType type)
   {
     m_rrset.setType(type);
   }
 
   void
-  setLabel (const Name& label)
+  setLabel(const Name& label)
   {
     m_rrset.setLabel(label);
   }
@@ -112,100 +109,97 @@ public:
     m_rrset.setZone(zone);
   }
   void
-  setZone (const Name& zone)
+  setZone(const Name& zone)
   {
     m_rrset.setZone(zone);
   }
 
   const Zone&
-  getZone () const
+  getZone() const
   {
     return m_rrset.getZone();
   }
 
   uint32_t
-  getId () const
+  getId() const
   {
     return m_id;
   }
 
   void
-  setId (uint32_t id)
+  setId(uint32_t id)
   {
     m_id = id;
   }
 
   const Block&
-  getWire () const
+  getWire() const
   {
     return m_wire;
   }
 
   void
-  setWire (const Block& wire)
+  setWire(const Block& wire)
   {
     m_wire = wire;
   }
 
-
   uint32_t
-  getTtl () const
+  getTtl() const
   {
     return m_ttl;
   }
 
   void
-  setTtl (uint32_t ttl)
+  setTtl(uint32_t ttl)
   {
     m_ttl = ttl;
   }
 
   const std::string&
-  getRrData () const
+  getRrData() const
   {
     return m_rrData;
   }
 
   void
-  setRrData (const std::string& rrData)
+  setRrData(const std::string& rrData)
   {
     m_rrData = rrData;
   }
 
   const RRSet&
-  getRrset () const
+  getRrset() const
   {
     return m_rrset;
   }
 
-/*
-  RR&
-  operator= (const RR& rr)
-  {
-    return *this;
-  }
-*/
+  /*
+   RR&
+   operator= (const RR& rr)
+   {
+   return *this;
+   }
+   */
   UpdateAction
-  getUpdateAction () const
+  getUpdateAction() const
   {
     return m_updateAction;
   }
 
   void
-  setUpdateAction (UpdateAction updateAction)
+  setUpdateAction(UpdateAction updateAction)
   {
     m_updateAction = updateAction;
   }
 
   void
-  setRrset (const RRSet& rrset)
+  setRrset(const RRSet& rrset)
   {
     m_rrset = rrset;
     //std::cout << "this.rrset="<< m_rrset  <<std::endl;
     //std::cout << "othe.rrset="<< rrset  <<std::endl;
   }
-
-
 
 private:
   uint32_t m_id;
@@ -224,18 +218,17 @@ private:
 //class RR
 
 inline std::ostream&
-operator<< (std::ostream& os, const RR& rr)
+operator<<(std::ostream& os, const RR& rr)
 {
-  os << "RR: Id=" << rr.getId ()
-    << " Data=";
+  os << "RR: Id=" << rr.getId() << " Data=";
   int maxsize = 23;
   if (rr.getRrData().size() > maxsize) {
-   os  << rr.getRrData ().substr (0, maxsize-3) + "...";
+    os << rr.getRrData().substr(0, maxsize - 3) + "...";
   }
   else {
     os << rr.getRrData();
   }
-  os << " rrset=[" << rr.getRrset () << "]";
+  os << " rrset=[" << rr.getRrset() << "]";
   os << " UpdateAction=" << toString(rr.getUpdateAction());
   os << "";
   return os;

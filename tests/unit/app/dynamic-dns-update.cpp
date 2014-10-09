@@ -49,27 +49,27 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(AppDynamicDnsUpdate)
+BOOST_AUTO_TEST_SUITE (AppDynamicDnsUpdate)
 
 BOOST_AUTO_TEST_CASE(Protocol)
 {
   string label = "AppDynamicDnsUpdate::Protocol";
-  printbegin (label);
+  printbegin(label);
 
-  Zone zone ("/com/skype");
-  DynamicDNSUpdate update ("update", "/com/skype", zone, Name ("/shock"), RR_FH, "/t-mobile");
+  Zone zone("/com/skype");
+  DynamicDNSUpdate update("update", "/com/skype", zone, Name("/shock"), RR_FH, "/t-mobile");
 
-  Interest interest = update.toInterest ();
+  Interest interest = update.toInterest();
 
   cout << toNameDigest(interest.getName()) << endl;
 
   QueryUpdate queryUpdate;
 
-  queryUpdate.fromInterest (interest);
+  queryUpdate.fromInterest(interest);
 
   cout << queryUpdate << endl;
 
-  printend (label);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

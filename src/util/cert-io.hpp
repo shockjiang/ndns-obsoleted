@@ -38,77 +38,77 @@ class HttpException : public std::runtime_error
 {
 public:
   explicit
-  HttpException (const std::string& what)
-    : std::runtime_error (what)
+  HttpException(const std::string& what)
+    : std::runtime_error(what)
   {
   }
 };
 
 ndn::shared_ptr<ndn::IdentityCertificate>
-getCertificateHttp (const std::string& host, const std::string& port, const std::string& path)
+getCertificateHttp(const std::string& host, const std::string& port, const std::string& path)
 {
   using namespace boost::asio::ip;
   tcp::iostream requestStream;
 
-  requestStream.expires_from_now (boost::posix_time::milliseconds (3000));
+  requestStream.expires_from_now(boost::posix_time::milliseconds(3000));
 
-  requestStream.connect (host, port);
-  if (!static_cast<bool> (requestStream)) {
-    throw HttpException ("HTTP connection error");
+  requestStream.connect(host, port);
+  if (!static_cast<bool>(requestStream)) {
+    throw HttpException("HTTP connection error");
   }
   requestStream << "GET " << path << " HTTP/1.0\r\n";
   requestStream << "Host: " << host << "\r\n";
   requestStream << "Accept: */*\r\n";
   requestStream << "Cache-Control: no-cache\r\n";
   requestStream << "Connection: close\r\n\r\n";
-  requestStream.flush ();
+  requestStream.flush();
 
   std::string statusLine;
-  std::getline (requestStream, statusLine);
-  if (!static_cast<bool> (requestStream)) {
-    throw HttpException ("HTTP communication error");
+  std::getline(requestStream, statusLine);
+  if (!static_cast<bool>(requestStream)) {
+    throw HttpException("HTTP communication error");
   }
 
-  std::stringstream responseStream (statusLine);
+  std::stringstream responseStream(statusLine);
   std::string httpVersion;
   responseStream >> httpVersion;
   unsigned int statusCode;
   responseStream >> statusCode;
   std::string statusMessage;
 
-  std::getline (responseStream, statusMessage);
-  if (!static_cast<bool> (requestStream) || httpVersion.substr (0, 5) != "HTTP/") {
-    throw HttpException ("HTTP communication error");
+  std::getline(responseStream, statusMessage);
+  if (!static_cast<bool>(requestStream) || httpVersion.substr(0, 5) != "HTTP/") {
+    throw HttpException("HTTP communication error");
   }
   if (statusCode != 200) {
-    throw HttpException ("HTTP server error");
+    throw HttpException("HTTP server error");
   }
   std::string header;
-  while (std::getline (requestStream, header) && header != "\r")
+  while (std::getline(requestStream, header) && header != "\r")
     ;
 
   ndn::OBufferStream os;
   {
     using namespace CryptoPP;
-    FileSource ss2 (requestStream, true, new Base64Decoder (new FileSink (os)));
+    FileSource ss2(requestStream, true, new Base64Decoder(new FileSink(os)));
   }
 
   ndn::shared_ptr<ndn::IdentityCertificate> identityCertificate = ndn::make_shared<
-    ndn::IdentityCertificate> ();
-  identityCertificate->wireDecode (ndn::Block (os.buf ()));
+    ndn::IdentityCertificate>();
+  identityCertificate->wireDecode(ndn::Block(os.buf()));
 
   return identityCertificate;
 }
 
 ndn::shared_ptr<ndn::IdentityCertificate>
-getIdentityCertificate (const std::string& fileName)
+getIdentityCertificate(const std::string& fileName)
 {
 
   if (fileName == "-")
-    return ndn::io::load<ndn::IdentityCertificate> (std::cin);
+    return ndn::io::load<ndn::IdentityCertificate>(std::cin);
   else {
     cout << "get the certificate from the file: " << fileName << endl;
-    return ndn::io::load<ndn::IdentityCertificate> (fileName);
+    return ndn::io::load<ndn::IdentityCertificate>(fileName);
   }
 }
 

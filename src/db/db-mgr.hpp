@@ -34,92 +34,93 @@ class DBMgr
 public:
   enum m_status
   {
-    DBConnected, DBClosed, DBError
+    DBConnected,
+    DBClosed,
+    DBError
   };
 
 public:
-  DBMgr ();
+  DBMgr();
   virtual
-  ~DBMgr ();
+  ~DBMgr();
 
   void
-  open ();
+  open();
   void
-  close ();
+  close();
   void
-  execute (std::string sql, int
-  (*callback) (void*, int, char**, char**), void * paras);
+  execute(std::string sql, int
+  (*callback)(void*, int, char**, char**), void * paras);
 
   void
-  executeOnly (std::string sql, int
-  (*callback) (void*, int, char**, char**), void * paras);
-
-  /*
-   * only the last sql execute call the callback function
-   */
-  void
-  execute (std::vector<std::string> sqls, int
-  (*callback) (void*, int, char**, char**), void * paras);
+  executeOnly(std::string sql, int
+  (*callback)(void*, int, char**, char**), void * paras);
 
   /*
    * only the last sql execute call the callback function
    */
   void
-  executeOnly (std::vector<std::string> sqls, int
-  (*callback) (void*, int, char**, char**), void * paras);
+  execute(std::vector<std::string> sqls, int
+  (*callback)(void*, int, char**, char**), void * paras);
+
+  /*
+   * only the last sql execute call the callback function
+   */
+  void
+  executeOnly(std::vector<std::string> sqls, int
+  (*callback)(void*, int, char**, char**), void * paras);
 
   int
-  callback_getInt (int argc, char **argv, char** azColNames);
+  callback_getInt(int argc, char **argv, char** azColNames);
 
   int
-  callback_getStr (int argc, char **argv, char** azColNames);
+  callback_getStr(int argc, char **argv, char** azColNames);
 
   /*@brief
    * the first column must be id
    */
   int
-  callback_get_insert_id (int argc, char **argv, char** azColNames);
+  callback_get_insert_id(int argc, char **argv, char** azColNames);
 
   static int
-  static_callback_getInt (void *param, int argc, char **argv, char **azColName)
+  static_callback_getInt(void *param, int argc, char **argv, char **azColName)
   {
-    DBMgr *mgr = reinterpret_cast<DBMgr*> (param);
-    return mgr->callback_getInt (argc, argv, azColName);
+    DBMgr *mgr = reinterpret_cast<DBMgr*>(param);
+    return mgr->callback_getInt(argc, argv, azColName);
 
   }
 
   static int
-  static_callback_getStr (void *param, int argc, char **argv, char **azColName)
+  static_callback_getStr(void *param, int argc, char **argv, char **azColName)
   {
-    DBMgr *mgr = reinterpret_cast<DBMgr*> (param);
-    return mgr->callback_getStr (argc, argv, azColName);
+    DBMgr *mgr = reinterpret_cast<DBMgr*>(param);
+    return mgr->callback_getStr(argc, argv, azColName);
 
   }
 
   static int
-  static_callback_doNothing (void *param, int argc, char **argv, char **azColName)
+  static_callback_doNothing(void *param, int argc, char **argv, char **azColName)
   {
     std::cout << "do nothing" << std::endl;
     return 0;
   }
 
   static int
-  static_callback_insert_id (void *param, int argc, char **argv, char **azColName)
+  static_callback_insert_id(void *param, int argc, char **argv, char **azColName)
   {
-    DBMgr *mgr = reinterpret_cast<DBMgr*> (param);
-    return mgr->callback_get_insert_id (argc, argv, azColName);
+    DBMgr *mgr = reinterpret_cast<DBMgr*>(param);
+    return mgr->callback_get_insert_id(argc, argv, azColName);
 
   }
 
   inline void
-  printSQL (std::string sql)
+  printSQL(std::string sql)
   {
 
-    if (sql.size () > SQL_PRINT_MAX_LENGHT) {
+    if (sql.size() > SQL_PRINT_MAX_LENGHT) {
       std::cout
         << "SQL="
-        << sql.substr (0, SQL_PRINT_MAX_LENGHT) + " ... "
-          + sql.substr (sql.size () - 5, sql.size ())
+        << sql.substr(0, SQL_PRINT_MAX_LENGHT) + " ... " + sql.substr(sql.size() - 5, sql.size())
         << std::endl;
       ;
     }
@@ -129,96 +130,96 @@ public:
   }
 
   inline void
-  addResultNum ()
+  addResultNum()
   {
     m_resultNum += 1;
   }
   inline void
-  clearResultNum ()
+  clearResultNum()
   {
     m_resultNum = 0;
   }
 
   const std::string&
-  getDbfile () const
+  getDbfile() const
   {
     return m_dbfile;
   }
 
   void
-  setDbfile (const std::string& dbfile)
+  setDbfile(const std::string& dbfile)
   {
     this->m_dbfile = dbfile;
   }
 
   const std::string&
-  getErr () const
+  getErr() const
   {
     return m_err;
   }
 
   void
-  setErr (const std::string& err)
+  setErr(const std::string& err)
   {
     this->m_err = err;
   }
 
   int
-  getReCode () const
+  getReCode() const
   {
     return m_reCode;
   }
 
   void
-  setReCode (int reCode)
+  setReCode(int reCode)
   {
     this->m_reCode = reCode;
   }
 
   m_status
-  getStatus () const
+  getStatus() const
   {
     return m_status;
   }
 
   void
-  setStatus (m_status status)
+  setStatus(m_status status)
   {
     this->m_status = status;
   }
 
   int
-  getResultNum () const
+  getResultNum() const
   {
     return m_resultNum;
   }
 
   void
-  setResultNum (int resultNum)
+  setResultNum(int resultNum)
   {
     m_resultNum = resultNum;
   }
 
   int32_t
-  getTempInt () const
+  getTempInt() const
   {
     return m_tempInt;
   }
 
   void
-  setTempInt (int32_t tempInt)
+  setTempInt(int32_t tempInt)
   {
     m_tempInt = tempInt;
   }
 
   const std::string&
-  getTempStr () const
+  getTempStr() const
   {
     return m_tempStr;
   }
 
   void
-  setTempStr (const std::string& tempStr)
+  setTempStr(const std::string& tempStr)
   {
     m_tempStr = tempStr;
   }

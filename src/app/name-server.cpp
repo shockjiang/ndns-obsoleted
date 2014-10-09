@@ -21,31 +21,31 @@
 
 namespace ndn {
 namespace ndns {
-NameServer::NameServer (const char *programName, const char *prefix, const char *nameZone,
+NameServer::NameServer(const char *programName, const char *prefix, const char *nameZone,
   const string dbfile)
-  : NDNApp (programName, prefix)
-  , m_zone (Name (nameZone))
-  , m_zoneMgr (m_zone)
+  : NDNApp(programName, prefix),
+    m_zone(Name(nameZone)),
+    m_zoneMgr(m_zone)
 {
-  m_zoneMgr.setDbfile (dbfile);
+  m_zoneMgr.setDbfile(dbfile);
   //m_zoneMgr.lookupId();
 } //NameServer Construction
 
 void
-NameServer::onInterest (const Name &name, const Interest &interest)
+NameServer::onInterest(const Name &name, const Interest &interest)
 {
 
-  cout << "[* -> *] receive Interest: " << toNameDigest(interest.getName ()) << std::endl;
+  cout << "[* -> *] receive Interest: " << toNameDigest(interest.getName()) << std::endl;
 
   std::string nameStr = interest.getName().toUri();
 
   std::map<std::string, std::string> map;
   //if (std::regex_match(nameStr, results, ndn::ndns::label::UPDATE_NAME_REGEX)) {
-  if (ndn::ndns::label::matchUpdateName (nameStr, map)) {
+  if (ndn::ndns::label::matchUpdateName(nameStr, map)) {
     //Here is Update Message
 
     QueryUpdate queryUpdate;
-    queryUpdate.fromInterest(interest);//, map);
+    queryUpdate.fromInterest(interest); //, map);
     ResponseUpdate re;
     queryUpdate.setUpdateZone(m_zone);
 
@@ -83,13 +83,13 @@ NameServer::onInterest (const Name &name, const Interest &interest)
 //
     re.setResult(msg);
 
-    std::cout << re << std::endl;;
-
+    std::cout << re << std::endl;
+    ;
 
     Data data = re.toData();
-    data.setFreshnessPeriod (re.getFreshness ());
-    m_keyChain.sign (data);
-    m_face.put (data);
+    data.setFreshnessPeriod(re.getFreshness());
+    m_keyChain.sign(data);
+    m_face.put(data);
     cout << "[* <- *] send response: " << re << endl;
 
     /*
@@ -100,56 +100,54 @@ NameServer::onInterest (const Name &name, const Interest &interest)
      * check the seq
      */
 
-
   }
- //else if (std::regex_match(nameStr, results, ndn::ndns::label::DNS_QUERY_NAME_REGEX)) {
+  //else if (std::regex_match(nameStr, results, ndn::ndns::label::DNS_QUERY_NAME_REGEX)) {
   else if (ndn::ndns::label::matchQueryName(nameStr, map)) {
     //Here is Query Message
 
     Query query;
     query.fromInterest(interest);
 
-
     Response response;
 
-    Name name2 = interest.getName ();
-    name2.appendVersion ();
-    response.setQueryName (name2);
+    Name name2 = interest.getName();
+    name2.appendVersion();
+    response.setQueryName(name2);
 
-    response.setFreshness (this->m_contentFreshness);
+    response.setFreshness(this->m_contentFreshness);
 
-    QueryMgr mgr (m_zone, query, response);
+    QueryMgr mgr(m_zone, query, response);
 
-    mgr.lookup ();
+    mgr.lookup();
 
-    if (response.getRrs ().size () > 0) {
-     response.setResponseType (RESPONSE_NDNS_Resp);
+    if (response.getRrs().size() > 0) {
+      response.setResponseType(RESPONSE_NDNS_Resp);
     }
     else {
 
-     if (query.getRrType () == RR_NS) {
-       int count = mgr.hasAuth ();
-       if (count < 0) {
-         cout << "[* !! *] lookup error, then exit: " << mgr.getErr () << endl;
-         return;
-       }
-       else if (count > 0) {
-         response.setResponseType (RESPONSE_NDNS_Auth);
-       }
-       else {
-         response.setResponseType (RESPONSE_NDNS_Nack);
-       }
-     }
-     else {
-       response.setResponseType (RESPONSE_NDNS_Nack);
-     }
+      if (query.getRrType() == RR_NS) {
+        int count = mgr.hasAuth();
+        if (count < 0) {
+          cout << "[* !! *] lookup error, then exit: " << mgr.getErr() << endl;
+          return;
+        }
+        else if (count > 0) {
+          response.setResponseType(RESPONSE_NDNS_Auth);
+        }
+        else {
+          response.setResponseType(RESPONSE_NDNS_Nack);
+        }
+      }
+      else {
+        response.setResponseType(RESPONSE_NDNS_Nack);
+      }
     }
 
-    Data data = response.toData ();
-    data.setFreshnessPeriod (response.getFreshness ());
+    Data data = response.toData();
+    data.setFreshnessPeriod(response.getFreshness());
 
-    m_keyChain.sign (data);
-    m_face.put (data);
+    m_keyChain.sign(data);
+    m_face.put(data);
     cout << "[* <- *] send response: " << response << ": " << data << endl;
   }
   else {
@@ -160,51 +158,51 @@ NameServer::onInterest (const Name &name, const Interest &interest)
 } //onInterest
 
 void
-NameServer::run ()
+NameServer::run()
 {
-  m_zoneMgr.lookupId ();
-  if (m_zoneMgr.getZone ().getId () == 0) {
+  m_zoneMgr.lookupId();
+  if (m_zoneMgr.getZone().getId() == 0) {
     m_hasError = true;
-    m_error = "cannot get Zone.id from database for name=" + m_zone.getAuthorizedName ().toUri ();
-    stop ();
+    m_error = "cannot get Zone.id from database for name=" + m_zone.getAuthorizedName().toUri();
+    stop();
   }
 
-  boost::asio::signal_set signalSet (m_ioService, SIGINT, SIGTERM);
-  signalSet.async_wait (boost::bind (&NDNApp::signalHandler, this));
+  boost::asio::signal_set signalSet(m_ioService, SIGINT, SIGTERM);
+  signalSet.async_wait(boost::bind(&NDNApp::signalHandler, this));
   // boost::bind(&NdnTlvPingServer::signalHandler, this)
   Name name;
-  name.set (m_prefix);
-  name.append (toString (QUERY_DNS));
+  name.set(m_prefix);
+  name.append(toString(QUERY_DNS));
 
   std::cout << "========= NDNS Name Server for Zone "
-            << m_zoneMgr.getZone ().getAuthorizedName ().toUri () << " Starts with Prefix "
+            << m_zoneMgr.getZone().getAuthorizedName().toUri() << " Starts with Prefix "
             << m_prefix;
   if (m_enableForwardingHint > 0) {
-    std::cout << " & ForwardingHint " << m_forwardingHint.toUri ();
+    std::cout << " & ForwardingHint " << m_forwardingHint.toUri();
   }
   std::cout << "=============" << std::endl;
 
-  m_face.setInterestFilter (name, bind (&NameServer::onInterest, this, _1, _2),
-                            bind (&NDNApp::onRegisterFailed, this, _1, _2));
+  m_face.setInterestFilter(name, bind(&NameServer::onInterest, this, _1, _2),
+                           bind(&NDNApp::onRegisterFailed, this, _1, _2));
   std::cout << "Name Server Register Name Prefix: " << name << std::endl;
 
   if (m_enableForwardingHint > 0) {
-    Name name2 = Name (m_forwardingHint);
-    name2.append (ndn::ndns::label::ForwardingHintLabel);
-    name2.append (name);
-    m_face.setInterestFilter (name2, bind (&NameServer::onInterest, this, _1, _2),
-                              bind (&NDNApp::onRegisterFailed, this, _1, _2));
+    Name name2 = Name(m_forwardingHint);
+    name2.append(ndn::ndns::label::ForwardingHintLabel);
+    name2.append(name);
+    m_face.setInterestFilter(name2, bind(&NameServer::onInterest, this, _1, _2),
+                             bind(&NDNApp::onRegisterFailed, this, _1, _2));
     std::cout << "Name Server Register Name Prefix: " << name2 << std::endl;
   }
 
   try {
-    m_face.processEvents ();
+    m_face.processEvents();
   }
   catch (std::exception& e) {
     m_hasError = true;
     m_error = "ERROR: ";
-    m_error += e.what ();
-    stop ();
+    m_error += e.what();
+    stop();
   }
 
 } //run

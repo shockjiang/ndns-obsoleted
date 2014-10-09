@@ -44,121 +44,119 @@ namespace ndns {
 
 template<class IQStrategy>
 //IQ stands for iterative Query Strategy
-class NameCachingResolver : public NDNApp
-{
-
-public:
-
-  NameCachingResolver (const char *programName, const char *prefix);
-
-  void
-  resolve (IQStrategy& iq);
-
-  using NDNApp::onData;
-  void
-  onData (const Interest& interest, Data &data, IQStrategy& iq);
-
-  void
-  onInterest (const Name &name, const Interest &interest, const bool keepResolver);
-
-  inline void
-  onInterest (const Name &name, const Interest &interest)
+  class NameCachingResolver : public NDNApp
   {
-    onInterest(name, interest, true);
-  }
 
+  public:
 
+    NameCachingResolver(const char *programName, const char *prefix);
 
-  using NDNApp::onTimeout;
-  void
-  onTimeout (const Interest& interest, IQStrategy& iq);
+    void
+    resolve(IQStrategy& iq);
 
-  void
-  run ();
+    using NDNApp::onData;
+    void
+    onData(const Interest& interest, Data &data, IQStrategy& iq);
 
-  const Name&
-  getRootZoneFowardingHint () const
-  {
-    return m_rootZoneFowardingHint;
-  }
+    void
+    onInterest(const Name &name, const Interest &interest, const bool keepResolver);
 
-  void
-  setRootZoneFowardingHint (const Name& rootZoneFowardingHint)
-  {
-    m_rootZoneFowardingHint = rootZoneFowardingHint;
-  }
+    inline void
+    onInterest(const Name &name, const Interest &interest)
+    {
+      onInterest(name, interest, true);
+    }
 
-private:
-  /**
-   * 0 means disable forwarding hint,
-   * 1 means enable forwarding hint
-   * todo: 2, retrieve name and hint of the name server as a optimization way
-   */
+    using NDNApp::onTimeout;
+    void
+    onTimeout(const Interest& interest, IQStrategy& iq);
 
-  Name m_rootZoneFowardingHint;
+    void
+    run();
 
-};
+    const Name&
+    getRootZoneFowardingHint() const
+    {
+      return m_rootZoneFowardingHint;
+    }
+
+    void
+    setRootZoneFowardingHint(const Name& rootZoneFowardingHint)
+    {
+      m_rootZoneFowardingHint = rootZoneFowardingHint;
+    }
+
+  private:
+    /**
+     * 0 means disable forwarding hint,
+     * 1 means enable forwarding hint
+     * todo: 2, retrieve name and hint of the name server as a optimization way
+     */
+
+    Name m_rootZoneFowardingHint;
+
+  };
 
 template<typename IQStrategy>
-  NameCachingResolver<IQStrategy>::NameCachingResolver (const char *programName, const char *prefix)
-    : NDNApp (programName, prefix)
+  NameCachingResolver<IQStrategy>::NameCachingResolver(const char *programName, const char *prefix)
+    : NDNApp(programName, prefix)
   {
-    this->setInterestLifetime (time::milliseconds (2000));
+    this->setInterestLifetime(time::milliseconds(2000));
   }
 
 template<class IQStrategy>
   void
-  NameCachingResolver<IQStrategy>::run ()
+  NameCachingResolver<IQStrategy>::run()
   {
-    boost::asio::signal_set signalSet (m_ioService, SIGINT, SIGTERM);
-    signalSet.async_wait (boost::bind (&NDNApp::signalHandler, this));
+    boost::asio::signal_set signalSet(m_ioService, SIGINT, SIGTERM);
+    signalSet.async_wait(boost::bind(&NDNApp::signalHandler, this));
     // boost::bind(&NdnTlvPingServer::signalHandler, this)
 
-    Name name (m_prefix);
-    name.append (toString (QUERY_DNS_R));
+    Name name(m_prefix);
+    name.append(toString(QUERY_DNS_R));
 
-    m_face.setInterestFilter (name, bind (&NameCachingResolver::onInterest, this, _1, _2),
-                              bind (&NDNApp::onRegisterFailed, this, _1, _2));
+    m_face.setInterestFilter(name, bind(&NameCachingResolver::onInterest, this, _1, _2),
+                             bind(&NDNApp::onRegisterFailed, this, _1, _2));
 
-    std::cout << "\n=== NDNS Resolver " << m_programName << " with routeble prefix "
-              << name.toUri () << " starts";
+    std::cout << "\n=== NDNS Resolver " << m_programName << " with routeble prefix " << name.toUri()
+              << " starts";
 
     if (this->m_enableForwardingHint > 0) {
-      std::cout << " & Root Zone ForwardingHint " << this->m_rootZoneFowardingHint.toUri ();
+      std::cout << " & Root Zone ForwardingHint " << this->m_rootZoneFowardingHint.toUri();
     }
     std::cout << "===" << std::endl;
 
     try {
-      m_face.processEvents ();
+      m_face.processEvents();
     }
     catch (std::exception& e) {
-      std::cerr << "ERROR: " << e.what () << std::endl;
+      std::cerr << "ERROR: " << e.what() << std::endl;
       m_hasError = true;
-      m_ioService.stop ();
+      m_ioService.stop();
     }
   }
 template<class IQStrategy>
   void
-  NameCachingResolver<IQStrategy>::onData (const Interest& interest, Data &data, IQStrategy& iq)
+  NameCachingResolver<IQStrategy>::onData(const Interest& interest, Data &data, IQStrategy& iq)
   {
 
-    iq.doData (data);
+    iq.doData(data);
 
-    if (iq.getStep () == QUERY_STEP_AnswerStub) {
-      Data data = iq.getLastResponse ().toData ();
-      Name name = iq.getQuery ().getAuthorityZone ();
-      name.append (toString (iq.getQuery ().getQueryType ()));
-      name.append (iq.getQuery ().getRrLabel ());
-      name.append (toString (iq.getQuery ().getRrType ()));
-      name.appendVersion ();
-      data.setName (name);
-      data.setFreshnessPeriod (this->m_contentFreshness);
+    if (iq.getStep() == QUERY_STEP_AnswerStub) {
+      Data data = iq.getLastResponse().toData();
+      Name name = iq.getQuery().getAuthorityZone();
+      name.append(toString(iq.getQuery().getQueryType()));
+      name.append(iq.getQuery().getRrLabel());
+      name.append(toString(iq.getQuery().getRrType()));
+      name.appendVersion();
+      data.setName(name);
+      data.setFreshnessPeriod(this->m_contentFreshness);
 
-      m_keyChain.sign (data);
-      m_face.put (data);
-      std::cout << "[* <- *] answer Response ("
-        << toString (iq.getLastResponse ().getResponseType ()) << ") to stub:" << std::endl;
-      std::cout << iq.getLastResponse () << std::endl;
+      m_keyChain.sign(data);
+      m_face.put(data);
+      std::cout << "[* <- *] answer Response (" << toString(iq.getLastResponse().getResponseType())
+        << ") to stub:" << std::endl;
+      std::cout << iq.getLastResponse() << std::endl;
       for (int i = 0; i < 15; i++) {
         std::cout << "----";
       }
@@ -167,20 +165,20 @@ template<class IQStrategy>
       //iq.setStep(FinishedSuccessfully);
 
     }
-    else if (iq.getStep () == QUERY_STEP_NSQuery) {
-      resolve (iq);
+    else if (iq.getStep() == QUERY_STEP_NSQuery) {
+      resolve(iq);
     }
-    else if (iq.getStep () == QUERY_STEP_RRQuery) {
-      resolve (iq);
+    else if (iq.getStep() == QUERY_STEP_RRQuery) {
+      resolve(iq);
     }
-    else if (iq.getStep () == QUERY_STEP_Abort) {
+    else if (iq.getStep() == QUERY_STEP_Abort) {
       return;
     }
-    else if (iq.getStep () == QUERY_STEP_FHQuery) {
-      resolve (iq);
+    else if (iq.getStep() == QUERY_STEP_FHQuery) {
+      resolve(iq);
     }
     else {
-      std::cout << "let me see the current step=" << toString (iq.getStep ()) << std::endl;
+      std::cout << "let me see the current step=" << toString(iq.getStep()) << std::endl;
       std::cout << iq;
       std::cout << std::endl;
     }
@@ -189,14 +187,15 @@ template<class IQStrategy>
 
 template<class IQStrategy>
   void
-  NameCachingResolver<IQStrategy>::onInterest (const Name &name, const Interest &interest, bool keepResolver)
+  NameCachingResolver<IQStrategy>::onInterest(const Name &name, const Interest &interest,
+    bool keepResolver)
   {
     Query query;
-    query.fromInterest (interest);
-    std::cout << "[* -> *] receive Interest: " << interest.getName ().toUri () << std::endl;
+    query.fromInterest(interest);
+    std::cout << "[* -> *] receive Interest: " << interest.getName().toUri() << std::endl;
 
     //std::cout << "LINE=" <<__LINE__<<std::endl;
-    IQStrategy iq (query);
+    IQStrategy iq(query);
 
     //std::cout << "LINE=" <<__LINE__<<std::endl;
     if (this->m_enableForwardingHint == 0) {
@@ -204,12 +203,12 @@ template<class IQStrategy>
     }
     else if (this->m_enableForwardingHint > 0) {
       //std::cout<<"--------------------create a Forwarding Hint"<<std::endl;
-      IterativeQueryWithForwardingHint& iqfh = dynamic_cast<IterativeQueryWithForwardingHint&> (iq);
-      iqfh.setForwardingHint (this->m_rootZoneFowardingHint);
-      iqfh.setLastForwardingHint (this->m_rootZoneFowardingHint);
+      IterativeQueryWithForwardingHint& iqfh = dynamic_cast<IterativeQueryWithForwardingHint&>(iq);
+      iqfh.setForwardingHint(this->m_rootZoneFowardingHint);
+      iqfh.setLastForwardingHint(this->m_rootZoneFowardingHint);
     }
     if (keepResolver) {
-      resolve (iq);
+      resolve(iq);
     }
     //resolve (iq);
     //std::cout << "LINE=" <<__LINE__<<std::endl;
@@ -217,42 +216,41 @@ template<class IQStrategy>
 
 template<class IQStrategy>
   void
-  NameCachingResolver<IQStrategy>::onTimeout (const Interest& interest, IQStrategy& iq)
+  NameCachingResolver<IQStrategy>::onTimeout(const Interest& interest, IQStrategy& iq)
   {
-    std::cout << "[* !! *] timeout Interest " << interest.getName ().toUri () << " timeouts"
+    std::cout << "[* !! *] timeout Interest " << interest.getName().toUri() << " timeouts"
               << std::endl;
 
-    iq.doTimeout ();
+    iq.doTimeout();
   }
 
 template<class IQStrategy>
   void
-  NameCachingResolver<IQStrategy>::resolve (IQStrategy& iq)
+  NameCachingResolver<IQStrategy>::resolve(IQStrategy& iq)
   {
 
-    Interest interest = iq.toLatestInterest ();
+    Interest interest = iq.toLatestInterest();
 
     //must be set before express interest,since the call will back call iq
     //if set after, then the iq in call of onData will return nothing
     //be very careful here,  as a new guy to c++
 
-    interest.setInterestLifetime (this->getInterestLifetime ());
-    iq.setLastInterest (interest);
+    interest.setInterestLifetime(this->getInterestLifetime());
+    iq.setLastInterest(interest);
 
-    std::cout << "lastInterest=" << iq.getLastInterest () << std::endl;
+    std::cout << "lastInterest=" << iq.getLastInterest() << std::endl;
 
     try {
-      m_face.expressInterest (interest,
-                              boost::bind (&NameCachingResolver::onData, this, _1, _2, iq),
-                              boost::bind (&NameCachingResolver::onTimeout, this, _1, iq));
+      m_face.expressInterest(interest, boost::bind(&NameCachingResolver::onData, this, _1, _2, iq),
+                             boost::bind(&NameCachingResolver::onTimeout, this, _1, iq));
       //boost::bind(&NameCachingResolver::onData, this, _1, _2, ndn::ref(iq)),
       //boost::bind(&NameCachingResolver::onTimeout, this, _1, iq));
     }
     catch (std::exception& e) {
-      std::cerr << "ERROR: " << e.what () << std::endl;
+      std::cerr << "ERROR: " << e.what() << std::endl;
     }
 
-    std::cout << "[* <- *] send Interest: " << interest.getName ().toUri () << std::endl;
+    std::cout << "[* <- *] send Interest: " << interest.getName().toUri() << std::endl;
     std::cout << iq << std::endl;
   }
 } /* namespace ndns */

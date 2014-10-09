@@ -37,24 +37,23 @@ namespace ndns {
 class DyndnsMgr : public DBMgr
 {
 public:
-  DyndnsMgr (Zone& zone, Response& re, QueryUpdate& queryUpdate);
+  DyndnsMgr(Zone& zone, Response& re, QueryUpdate& queryUpdate);
 
   virtual
-  ~DyndnsMgr ();
+  ~DyndnsMgr();
 
   void
-  update () throw();
+  update() throw ();
 
   int
-  callback_update (int argc, char **argv, char **azColName);
+  callback_update(int argc, char **argv, char **azColName);
 
   static int
-  static_callback_update (void *param, int argc, char ** argv, char **azColName)
+  static_callback_update(void *param, int argc, char ** argv, char **azColName)
   {
 
     return 0;
   }
-
 
   Zone& m_zone;
   Response& m_response;

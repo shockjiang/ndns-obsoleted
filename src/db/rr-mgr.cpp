@@ -22,12 +22,12 @@
 namespace ndn {
 namespace ndns {
 
-RRMgr::RRMgr ()
+RRMgr::RRMgr()
 {
 
 }
 
-RRMgr::~RRMgr ()
+RRMgr::~RRMgr()
 {
 }
 
@@ -41,8 +41,7 @@ RRMgr::lookupIds()
   while (iter != m_rrs.end()) {
     RR& rr = **iter;
     if (rr.getRrset().getZone().getId() == 0 || rr.getRrset().getId() == 0) {
-      std::cout <<" One Id is not initialized. Zone.id="
-                << rr.getRrset().getZone().getId()
+      std::cout << " One Id is not initialized. Zone.id=" << rr.getRrset().getZone().getId()
                 << " RRSet.id=" << rr.getRrset().getId() << std::endl;
     }
     else {
@@ -51,7 +50,7 @@ RRMgr::lookupIds()
       sql += " AND rrdata=\'" + rr.getRrData() + "\'";
       this->setTempInt(0);
       this->executeOnly(sql, static_callback_getInt, this);
-    rr.setId(this->m_tempInt);
+      rr.setId(this->m_tempInt);
     }
     iter++;
   }
@@ -64,46 +63,46 @@ RRMgr::remove()
 {
   std::string sql;
 
-  std::vector<RR*>::iterator iter = m_rrs.begin ();
+  std::vector<RR*>::iterator iter = m_rrs.begin();
 
-  this->open ();
-  while (iter != m_rrs.end ()) {
+  this->open();
+  while (iter != m_rrs.end()) {
     RR& rr = **iter;
     sql = "DELETE from rrs WHERE id=";
-    sql += std::to_string (rr.getId ());
+    sql += std::to_string(rr.getId());
 
-    this->executeOnly (sql, this->static_callback_doNothing, this);
+    this->executeOnly(sql, this->static_callback_doNothing, this);
     iter++;
   }
 
-  this->close ();
+  this->close();
 
 }
 
 void
-RRMgr::insert ()
+RRMgr::insert()
 {
   std::string sql;
 
-  std::vector<RR*>::iterator iter = m_rrs.begin ();
+  std::vector<RR*>::iterator iter = m_rrs.begin();
 
-  this->open ();
-  while (iter != m_rrs.end ()) {
+  this->open();
+  while (iter != m_rrs.end()) {
     RR& rr = **iter;
     sql = "INSERT INTO rrs(rrset_id, ttl, rrdata) VALUES (";
-    sql += std::to_string (rr.getRrset ().getId ()) + ", ";
-    sql += std::to_string (rr.getTtl ()) + ", ";
-    sql += "\'" + rr.getRrData () + "\'";
+    sql += std::to_string(rr.getRrset().getId()) + ", ";
+    sql += std::to_string(rr.getTtl()) + ", ";
+    sql += "\'" + rr.getRrData() + "\'";
     sql += ")";
 
-    this->executeOnly (sql, this->static_callback_insert_id, this);
+    this->executeOnly(sql, this->static_callback_insert_id, this);
 
-    rr.setId(sqlite3_last_insert_rowid (this->m_conn));
+    rr.setId(sqlite3_last_insert_rowid(this->m_conn));
 
     iter++;
   }
 
-  this->close ();
+  this->close();
 
 }
 

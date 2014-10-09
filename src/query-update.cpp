@@ -22,20 +22,20 @@
 namespace ndn {
 namespace ndns {
 
-QueryUpdate::QueryUpdate ()
+QueryUpdate::QueryUpdate()
 {
 }
 
-QueryUpdate::~QueryUpdate ()
+QueryUpdate::~QueryUpdate()
 {
 }
 
 Interest
-QueryUpdate::toInterest (KeyChain& keyChain)
+QueryUpdate::toInterest(KeyChain& keyChain)
 {
 
-  Data data = m_update.toData ();
-  keyChain.sign (data);
+  Data data = m_update.toData();
+  keyChain.sign(data);
   m_wiredUpdate = data.wireEncode();
 
   Name name;
@@ -44,37 +44,37 @@ QueryUpdate::toInterest (KeyChain& keyChain)
   }
   else {
     name = m_forwardingHint;
-    name.append (ndn::ndns::label::ForwardingHintLabel);
+    name.append(ndn::ndns::label::ForwardingHintLabel);
   }
-  name.append (this->m_authorityZone);
-  name.append (toString (this->m_queryType));
-  name.append (m_wiredUpdate);
-  name.append (ndn::ndns::toString (this->m_rrType));
+  name.append(this->m_authorityZone);
+  name.append(toString(this->m_queryType));
+  name.append(m_wiredUpdate);
+  name.append(ndn::ndns::toString(this->m_rrType));
   name.appendVersion();
   Selectors selector;
 
-  Interest interest = Interest (name, selector, -1, this->m_interestLifetime);
+  Interest interest = Interest(name, selector, -1, this->m_interestLifetime);
   return interest;
 }
 
 bool
-QueryUpdate::fromInterest (const Name& name, const Interest& interest)
+QueryUpdate::fromInterest(const Name& name, const Interest& interest)
 {
   return this->fromInterest(interest);
 }
 
 bool
-QueryUpdate::fromInterest (const Interest& interest)
+QueryUpdate::fromInterest(const Interest& interest)
 {
-  const Name& interestName = interest.getName ();
+  const Name& interestName = interest.getName();
   std::map<std::string, std::string> map;
   if (ndn::ndns::label::matchUpdateName(interestName.toUri(), map)) {
     this->fromInterest(interest, map);
     return true;
   }
   else {
-    std::cerr << "The name does not match the patter of NDNS Update: "
-              << interest.getName().toUri() <<std::endl;
+    std::cerr << "The name does not match the patter of NDNS Update: " << interest.getName().toUri()
+              << std::endl;
 
     return false;
   }
@@ -83,9 +83,9 @@ QueryUpdate::fromInterest (const Interest& interest)
 }
 
 bool
-QueryUpdate::fromInterest (const Interest& interest, std::map<std::string, std::string>& map)
+QueryUpdate::fromInterest(const Interest& interest, std::map<std::string, std::string>& map)
 {
-  const Name& interestName = interest.getName ();
+  const Name& interestName = interest.getName();
 
   this->m_authorityZone = Name(map["zone"]);
   this->m_queryType = toQueryType(map["queryType"]);
@@ -95,7 +95,6 @@ QueryUpdate::fromInterest (const Interest& interest, std::map<std::string, std::
   if (map["hint"] != "") {
     this->m_forwardingHint = Name(map["hint"]);
   }
-
 
   ssize_t temp = 0;
   // hint cannot be "/"
@@ -119,11 +118,11 @@ QueryUpdate::fromInterest (const Interest& interest, std::map<std::string, std::
 
   temp += 1;
   this->m_wiredUpdate = interestName.get(temp).blockFromValue();
-  this->m_interestLifetime = interest.getInterestLifetime ();
+  this->m_interestLifetime = interest.getInterestLifetime();
   //std::cout << "to init data" << std::endl;
-  Data data (m_wiredUpdate);
+  Data data(m_wiredUpdate);
 
-  m_update.fromData (data);
+  m_update.fromData(data);
 
   return true;
 }

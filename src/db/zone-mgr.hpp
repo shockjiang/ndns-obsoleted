@@ -33,28 +33,28 @@ class ZoneMgr : public DBMgr
 {
 
 public:
-  ZoneMgr (Zone& zone);
+  ZoneMgr(Zone& zone);
 
 public:
   void
-  lookupId (const Name& name);
+  lookupId(const Name& name);
 
   void
-  lookupId ();
+  lookupId();
 
   int
-  callback_setId (int argc, char **argv, char **azColName);
+  callback_setId(int argc, char **argv, char **azColName);
 
   static int
-  static_callback_setId (void *param, int argc, char **argv, char **azColName)
+  static_callback_setId(void *param, int argc, char **argv, char **azColName)
   {
 
-    ZoneMgr *mgr = reinterpret_cast<ZoneMgr*> (param);
-    return mgr->callback_setId (argc, argv, azColName);
+    ZoneMgr *mgr = reinterpret_cast<ZoneMgr*>(param);
+    return mgr->callback_setId(argc, argv, azColName);
   }
 
   void
-  insert ();
+  insert();
 
 //  int
 //  callback_insert (int argc, char **argv, char **azColName);
@@ -68,29 +68,28 @@ public:
 //  }
 
   const Zone&
-  getZone () const
+  getZone() const
   {
     return m_zone;
   }
 
   void
-  setZone (const Zone& zone)
+  setZone(const Zone& zone)
   {
     this->m_zone = zone;
   }
 
   /*
-  ZoneMgr&
-  operator= (const ZoneMgr& rr)
-  {
-    return *this;
-  }
-  */
+   ZoneMgr&
+   operator= (const ZoneMgr& rr)
+   {
+   return *this;
+   }
+   */
 private:
   Zone& m_zone;
 };
 
-
-}//namespace ndns
+} //namespace ndns
 } //namespace ndn
 #endif

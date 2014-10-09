@@ -27,27 +27,24 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(QueryUpdate)
+BOOST_AUTO_TEST_SUITE (QueryUpdate)
 
 BOOST_AUTO_TEST_CASE(UnderstandInterest)
 {
 
   string label = "QueryUpdate::UnderstandInterst";
-  printbegin (label);
+  printbegin(label);
 
   KeyChain keyChain;
 
   ndns::QueryUpdate q;
-  q.setFowardingHint (Name ("/ucla"));
-  Name n1 ("/");
-  Name n2 ("/www.baidu.com");
-  q.setAuthorityZone (n1);
-  q.setRrLabel (n2);
-  q.setQueryType (QUERY_DNS);
+  q.setFowardingHint(Name("/ucla"));
+  Name n1("/");
+  Name n2("/www.baidu.com");
+  q.setAuthorityZone(n1);
+  q.setRrLabel(n2);
+  q.setQueryType(QUERY_DNS);
   q.setRrType(ndn::ndns::RR_DYNDNS_UPDATE);
-
-
-
 
   Zone zone("/net");
   zone.setId(0);
@@ -55,22 +52,22 @@ BOOST_AUTO_TEST_CASE(UnderstandInterest)
   Name rrLabel = Name("/skype");
   std::string rrData = "/att";
 
-  Name name = zone.getAuthorizedName ();
-  name.append (toString (QUERY_DNS));
-  name.append (rrLabel);
-  name.append (toString (rrType));
-  name.appendVersion ();
+  Name name = zone.getAuthorizedName();
+  name.append(toString(QUERY_DNS));
+  name.append(rrLabel);
+  name.append(toString(rrType));
+  name.appendVersion();
 
   Response update;
-  update.setQueryName (name);
-  update.setQueryType (QUERY_DNS);
+  update.setQueryName(name);
+  update.setQueryType(QUERY_DNS);
 
-  update.setResponseType (RESPONSE_NDNS_Resp);
+  update.setResponseType(RESPONSE_NDNS_Resp);
 
   RR rr;
 
-  rr.setRrData (rrData);
-  rr.setId (0);
+  rr.setRrData(rrData);
+  rr.setId(0);
   rr.setUpdateAction(UPDATE_ACTION_ADD);
 
   RRSet rrset;
@@ -81,29 +78,27 @@ BOOST_AUTO_TEST_CASE(UnderstandInterest)
   rr.setRrset(rrset);
   std::cout << rr << std::endl;
 
-
-
-  update.addRr (rr);
+  update.addRr(rr);
   q.setUpdate(update);
 
   std::cout << rr << std::endl;
-  std::cout << q.getUpdate().getStringRRs()<< std::endl;
+  std::cout << q.getUpdate().getStringRRs() << std::endl;
 
-  Interest interest = q.toInterest (keyChain);
+  Interest interest = q.toInterest(keyChain);
   Name name0 = interest.getName();
 
-  cout << "InterestName=" << toNameDigest(interest.getName ()) << endl;
+  cout << "InterestName=" << toNameDigest(interest.getName()) << endl;
 
   ndns::QueryUpdate q2;
-  q2.fromInterest (interest);
+  q2.fromInterest(interest);
 
-  cout << "AuthZone=" << q2.getAuthorityZone () << endl;
-  BOOST_CHECK_EQUAL(q.getAuthorityZone (), q2.getAuthorityZone ());
+  cout << "AuthZone=" << q2.getAuthorityZone() << endl;
+  BOOST_CHECK_EQUAL(q.getAuthorityZone(), q2.getAuthorityZone());
   BOOST_CHECK_EQUAL(q.getUpdate().getStringRRs(), q2.getUpdate().getStringRRs());
-  BOOST_CHECK_EQUAL(q.getQueryType (), q2.getQueryType ());
-  BOOST_CHECK_EQUAL(q.getFowardingHint (), q2.getFowardingHint ());
+  BOOST_CHECK_EQUAL(q.getQueryType(), q2.getQueryType());
+  BOOST_CHECK_EQUAL(q.getFowardingHint(), q2.getFowardingHint());
 
-  printend (label);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

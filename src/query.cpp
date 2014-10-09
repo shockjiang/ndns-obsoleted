@@ -22,27 +22,27 @@
 namespace ndn {
 namespace ndns {
 
-Query::Query ()
-  : m_queryType (QUERY_DNS)
-  , m_interestLifetime (time::milliseconds (4000))
-  , m_rrType (RR_NS)
+Query::Query()
+  : m_queryType(QUERY_DNS),
+    m_interestLifetime(time::milliseconds(4000)),
+    m_rrType(RR_NS)
 {
 }
 
-Query::~Query ()
+Query::~Query()
 {
-}
-
-bool
-Query::fromInterest (const Name &name, const Interest &interest)
-{
-  return fromInterest (interest);
 }
 
 bool
-Query::fromInterest (const Interest& interest)
+Query::fromInterest(const Name &name, const Interest &interest)
 {
-  const Name& interestName = interest.getName ();
+  return fromInterest(interest);
+}
+
+bool
+Query::fromInterest(const Interest& interest)
+{
+  const Name& interestName = interest.getName();
 
   std::map<std::string, std::string> map;
   if (ndn::ndns::label::matchQueryName(interestName.toUri(), map)) {
@@ -50,15 +50,15 @@ Query::fromInterest (const Interest& interest)
     return true;
   }
   else {
-    std::cerr << "The name does not match the patter of NDNS Query: "
-              << interestName.toUri() <<std::endl;
+    std::cerr << "The name does not match the patter of NDNS Query: " << interestName.toUri()
+              << std::endl;
     return false;
   }
   return false;
 }
 
 bool
-Query::fromInterest (const Interest& interest, std::map<std::string, std::string>& map)
+Query::fromInterest(const Interest& interest, std::map<std::string, std::string>& map)
 {
   this->m_authorityZone = Name(map["zone"]);
   this->m_queryType = toQueryType(map["queryType"]);
@@ -68,13 +68,13 @@ Query::fromInterest (const Interest& interest, std::map<std::string, std::string
     this->m_forwardingHint = Name(map["hint"]);
   }
 
-  this->m_interestLifetime = interest.getInterestLifetime ();
+  this->m_interestLifetime = interest.getInterestLifetime();
 
   return true;
 }
 
 Interest
-Query::toInterest () const
+Query::toInterest() const
 {
   Name name;
   if (m_forwardingHint.empty()) {
@@ -82,17 +82,17 @@ Query::toInterest () const
   }
   else {
     name = m_forwardingHint;
-    name.append (ndn::ndns::label::ForwardingHintLabel);
+    name.append(ndn::ndns::label::ForwardingHintLabel);
 
   }
 
-  name.append (this->m_authorityZone);
-  name.append (toString (this->m_queryType));
-  name.append (this->m_rrLabel);
-  name.append (ndn::ndns::toString (this->m_rrType));
+  name.append(this->m_authorityZone);
+  name.append(toString(this->m_queryType));
+  name.append(this->m_rrLabel);
+  name.append(ndn::ndns::toString(this->m_rrType));
   Selectors selector;
 
-  Interest interest = Interest (name, selector, -1, this->m_interestLifetime);
+  Interest interest = Interest(name, selector, -1, this->m_interestLifetime);
   return interest;
 }
 

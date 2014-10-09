@@ -34,33 +34,33 @@ BOOST_AUTO_TEST_SUITE(Rr)
 BOOST_AUTO_TEST_CASE(Encode)
 {
   string label = "Rr:Encode";
-  printbegin (label);
+  printbegin(label);
 
-  Zone zone ("/");
-  Zone zone2 ("/net");
+  Zone zone("/");
+  Zone zone2("/net");
 
-  zone.setId (1);
-  zone2.setId (2);
+  zone.setId(1);
+  zone2.setId(2);
 
-  RRSet rrset1 (zone);
-  RRSet rrset2 (zone2);
+  RRSet rrset1(zone);
+  RRSet rrset2(zone2);
 
-  ndns::RR rr (rrset1);
+  ndns::RR rr(rrset1);
   std::string ex = "www2.ex.com";
   uint32_t id = 201;
-  rr.setRrData (ex);
-  rr.setId (id);
+  rr.setRrData(ex);
+  rr.setId(id);
 
   cout << "before encode" << endl;
-  ndn::Block block = rr.wireEncode ();
-  cout << "Encode finishes with totalLenght=" << block.size () << endl;
+  ndn::Block block = rr.wireEncode();
+  cout << "Encode finishes with totalLenght=" << block.size() << endl;
 
-  ndns::RR rr2 (rrset2);
-  rr2.wireDecode (block);
+  ndns::RR rr2(rrset2);
+  rr2.wireDecode(block);
 
-  BOOST_CHECK_EQUAL(rr2.getRrData (), ex);
-  BOOST_CHECK_EQUAL(rr2.getId (), id);
-  printend (label);
+  BOOST_CHECK_EQUAL(rr2.getRrData(), ex);
+  BOOST_CHECK_EQUAL(rr2.getId(), id);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

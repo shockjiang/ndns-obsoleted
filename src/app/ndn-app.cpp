@@ -22,20 +22,20 @@
 namespace ndn {
 namespace ndns {
 
-NDNApp::NDNApp (const char *programName, const char *prefix)
-  : m_programName (programName)
-  , m_prefix (prefix)
-  , m_hasError (false)
-  , m_contentFreshness (time::milliseconds (40000))
-  , m_interestLifetime (time::milliseconds (4000))
-  , m_interestTriedMax (2)
-  , m_interestTriedNum (0)
-  , m_face (m_ioService)
-  , m_enableForwardingHint (0)
+NDNApp::NDNApp(const char *programName, const char *prefix)
+  : m_programName(programName),
+    m_prefix(prefix),
+    m_hasError(false),
+    m_contentFreshness(time::milliseconds(40000)),
+    m_interestLifetime(time::milliseconds(4000)),
+    m_interestTriedMax(2),
+    m_interestTriedNum(0),
+    m_face(m_ioService),
+    m_enableForwardingHint(0)
 {
 }
 
-NDNApp::~NDNApp ()
+NDNApp::~NDNApp()
 {
   m_programName = 0;
   m_prefix = 0;

@@ -19,13 +19,13 @@ namespace ndns {
 namespace tests {
 
 void inline
-printbegin (std::string label)
+printbegin(std::string label)
 {
   std::cout << std::endl << "-->>>>>>>>>>>>>>" << label << " begins:" << std::endl;
 }
 
 void inline
-printend (std::string label)
+printend(std::string label)
 {
   std::cout << "<<<<<<<<<<<<<<--" << label << " ends." << std::endl;
 }

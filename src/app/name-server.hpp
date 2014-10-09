@@ -52,14 +52,14 @@ class NameServer : public NDNApp
 
 public:
   explicit
-  NameServer (const char *programName, const char *prefix, const char *nameZone,
+  NameServer(const char *programName, const char *prefix, const char *nameZone,
     const string dbfile = "src/db/ndns-local.db");
 
   void
-  onInterest (const Name &name, const Interest &interest);
+  onInterest(const Name &name, const Interest &interest);
 
   void
-  run ();
+  run();
 
 public:
   /*

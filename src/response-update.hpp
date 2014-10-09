@@ -31,37 +31,37 @@ namespace ndns {
 class ResponseUpdate : public Response
 {
 public:
-  ResponseUpdate ();
+  ResponseUpdate();
   virtual
-  ~ResponseUpdate ();
+  ~ResponseUpdate();
 
   const Block&
-  wireEncode () const;
+  wireEncode() const;
 
   void
-  wireDecode (const Block& wire);
+  wireDecode(const Block& wire);
 
   template<bool T>
-  size_t
-  wireEncode (EncodingImpl<T> & block) const;
+    size_t
+    wireEncode(EncodingImpl<T> & block) const;
 
   void
-  fromData (const Name& name, const Data& data);
+  fromData(const Name& name, const Data& data);
 
   void
-  fromData (const Data &data);
+  fromData(const Data &data);
 
   Data
-  toData () const;
+  toData() const;
 
   const std::string&
-  getResult () const
+  getResult() const
   {
     return m_result;
   }
 
   void
-  setResult (const std::string& result)
+  setResult(const std::string& result)
   {
     m_result = result;
   }
@@ -70,14 +70,12 @@ private:
   std::string m_result;
 };
 
-
 inline std::ostream&
-operator<< (std::ostream& os, const ResponseUpdate& ru)
+operator<<(std::ostream& os, const ResponseUpdate& ru)
 {
-  os << "ResponseUpdate: queryName=" << toNameDigest(ru.getQueryName ())
-     << " responseType=" << toString (ru.getResponseType ())
-     << " queryType=" << toString (ru.getQueryType ())
-     << " result=" << ru.getResult();
+  os << "ResponseUpdate: queryName=" << toNameDigest(ru.getQueryName()) << " responseType="
+     << toString(ru.getResponseType()) << " queryType=" << toString(ru.getQueryType()) << " result="
+     << ru.getResult();
 
   return os;
 }

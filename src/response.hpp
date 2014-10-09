@@ -47,105 +47,104 @@ class Response
 {
 public:
 
-  Response ();
+  Response();
   virtual
-  ~Response ();
-
+  ~Response();
 
   inline void
-  addRr (RR rr)
+  addRr(RR rr)
   {
-    this->m_rrs.push_back (rr);
+    this->m_rrs.push_back(rr);
   }
 
   const Block&
-  wireEncode () const;
+  wireEncode() const;
 
   void
-  wireDecode (const Block& wire);
+  wireDecode(const Block& wire);
 
   template<bool T>
-  size_t
-  wireEncode (EncodingImpl<T> & block) const;
+    size_t
+    wireEncode(EncodingImpl<T> & block) const;
 
   void
-  fromData (const Name& name, const Data& data);
+  fromData(const Name& name, const Data& data);
 
   void
-  fromData (const Data &data);
+  fromData(const Data &data);
 
   Data
-  toData () const;
+  toData() const;
 
   const std::string
-  getStringRRs () const
+  getStringRRs() const
   {
     std::stringstream str;
 
-    std::vector<RR>::const_iterator iter = m_rrs.begin ();
-    while (iter != m_rrs.end ()) {
+    std::vector<RR>::const_iterator iter = m_rrs.begin();
+    while (iter != m_rrs.end()) {
       str << "{" << *iter << "}";
       iter++;
     }
-    return str.str ();
+    return str.str();
   }
 
   QueryType
-  getQueryType () const
+  getQueryType() const
   {
     return m_queryType;
   }
 
   void
-  setQueryType (QueryType queryType)
+  setQueryType(QueryType queryType)
   {
     m_queryType = queryType;
   }
 
   time::milliseconds
-  getFreshness () const
+  getFreshness() const
   {
     return m_freshness;
   }
 
   void
-  setFreshness (time::milliseconds freshness)
+  setFreshness(time::milliseconds freshness)
   {
     m_freshness = freshness;
   }
 
   const Name&
-  getQueryName () const
+  getQueryName() const
   {
     return m_queryName;
   }
 
   void
-  setQueryName (const Name& queryName)
+  setQueryName(const Name& queryName)
   {
     m_queryName = queryName;
   }
 
   ResponseType
-  getResponseType () const
+  getResponseType() const
   {
     return m_responseType;
   }
 
   void
-  setResponseType (ResponseType responseType)
+  setResponseType(ResponseType responseType)
   {
     m_responseType = responseType;
   }
 
   const std::vector<RR>&
-  getRrs () const
+  getRrs() const
   {
     return m_rrs;
   }
 
   void
-  setRrs (const std::vector<RR>& rrs)
+  setRrs(const std::vector<RR>& rrs)
   {
     m_rrs = rrs;
   }
@@ -186,12 +185,11 @@ protected:
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const Response& response)
+operator<<(std::ostream& os, const Response& response)
 {
-  os << "Response: queryName=" << toNameDigest(response.getQueryName ().toUri ())
-    << " responseType=" << toString (response.getResponseType ())
-    << " queryType=" << toString (response.getQueryType ())
-    << " rrs=>" << response.getStringRRs() << "<";
+  os << "Response: queryName=" << toNameDigest(response.getQueryName().toUri()) << " responseType="
+     << toString(response.getResponseType()) << " queryType=" << toString(response.getQueryType())
+     << " rrs=>" << response.getStringRRs() << "<";
   return os;
 }
 

@@ -33,35 +33,34 @@ namespace ndns {
 class RRMgr : public DBMgr
 {
 public:
-  RRMgr ();
+  RRMgr();
   virtual
-  ~RRMgr ();
+  ~RRMgr();
 
   void
   lookupIds();
 
   void
-  insert ();
-
+  insert();
 
   void
   remove();
 
   inline void
-  addRR (RR& rr)
+  addRR(RR& rr)
   {
     //boost::shared_ptr<RR> rrP(&rr);
-    m_rrs.push_back (&rr);
+    m_rrs.push_back(&rr);
   }
 
   inline void
-  addRR (RR* rr)
+  addRR(RR* rr)
   {
-    m_rrs.push_back (rr);
+    m_rrs.push_back(rr);
   }
 
   const std::vector<RR*>&
-  getRrs () const
+  getRrs() const
   {
     return m_rrs;
   }

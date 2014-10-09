@@ -31,22 +31,22 @@ namespace ndns {
 class RRSetMgr : public DBMgr
 {
 public:
-  RRSetMgr ();
+  RRSetMgr();
   virtual
-  ~RRSetMgr ();
+  ~RRSetMgr();
 
   void
-  addRRSet (RRSet& rrset)
+  addRRSet(RRSet& rrset)
   {
 
-    m_rrsets.push_back (&rrset);
+    m_rrsets.push_back(&rrset);
   }
 
   bool
-  insert ();
+  insert();
 
   void
-  lookupIds ();
+  lookupIds();
 
   void
   removeRelatedRRs();

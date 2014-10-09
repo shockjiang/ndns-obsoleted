@@ -40,131 +40,130 @@ namespace ndns {
 class IterativeQuery
 {
 public:
-  IterativeQuery (const Query&);
+  IterativeQuery(const Query&);
   virtual
-  ~IterativeQuery ();
+  ~IterativeQuery();
 
   virtual void
-  doData (Data& data);
+  doData(Data& data);
 
   virtual bool
-  doTimeout ();
+  doTimeout();
 
   void
-  abort ();
+  abort();
 
   virtual const Interest
-  toLatestInterest ();
+  toLatestInterest();
 
   bool
-  hasFinished ()
+  hasFinished()
   {
-    return m_query.getRrLabel ().size () == m_finishedLabelNum;
+    return m_query.getRrLabel().size() == m_finishedLabelNum;
   }
 
   void
-  addTryNum ()
+  addTryNum()
   {
     m_tryNum += 1;
   }
 
   ssize_t
-  getFinishedLabelNum () const
+  getFinishedLabelNum() const
   {
     return m_finishedLabelNum;
   }
 
   void
-  setFinishedLabelNum (ssize_t finishedLabelNum)
+  setFinishedLabelNum(ssize_t finishedLabelNum)
   {
     m_finishedLabelNum = finishedLabelNum;
   }
 
   const Query&
-  getQuery () const
+  getQuery() const
   {
     return m_query;
   }
 
   const Response&
-  getLastResponse () const
+  getLastResponse() const
   {
     return m_lastResponse;
   }
 
   void
-  setLastResponse (const Response& response)
+  setLastResponse(const Response& response)
   {
     m_lastResponse = response;
   }
 
   unsigned short
-  getTryMax () const
+  getTryMax() const
   {
     return m_tryMax;
   }
 
   void
-  setTryMax (unsigned short tryMax)
+  setTryMax(unsigned short tryMax)
   {
     m_tryMax = tryMax;
   }
 
   unsigned short
-  getTryNum () const
+  getTryNum() const
   {
     return m_tryNum;
   }
 
   void
-  setTryNum (unsigned short tryNum)
+  setTryNum(unsigned short tryNum)
   {
     m_tryNum = tryNum;
   }
 
   const Interest&
-  getLastInterest () const
+  getLastInterest() const
   {
     return m_lastInterest;
   }
 
   void
-  setLastInterest (const Interest& lastInterest)
+  setLastInterest(const Interest& lastInterest)
   {
     m_lastInterest = lastInterest;
 
   }
 
   QuerySteps
-  getStep () const
+  getStep() const
   {
     return m_step;
   }
 
   ssize_t
-  getRrLabelLen () const
+  getRrLabelLen() const
   {
     return m_rrLabelLen;
   }
 
   void
-  setRrLabelLen (ssize_t rrLabelLen)
+  setRrLabelLen(ssize_t rrLabelLen)
   {
     m_rrLabelLen = rrLabelLen;
   }
 
   unsigned int
-  getAuthZoneIndex () const
+  getAuthZoneIndex() const
   {
     return m_authZoneIndex;
   }
 
   void
-  setRrAsNextAuthorityZoneToTry (unsigned int authZoneIndex)
+  setRrAsNextAuthorityZoneToTry(unsigned int authZoneIndex)
   {
     m_authZoneIndex = authZoneIndex;
   }
-
 
 protected:
   QuerySteps m_step;
@@ -215,16 +214,13 @@ protected:
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const IterativeQuery iq)
+operator<<(std::ostream& os, const IterativeQuery iq)
 {
-  os << "InterativeQuery: dstLabel=" << iq.getQuery ().getRrLabel ().toUri ()
-    << " currentStep=" << toString (iq.getStep ())
-    << " finishedLabel=" << iq.getFinishedLabelNum ()
-    << " rrLabelen=" << iq.getRrLabelLen ()
-    << " NextAuZoneIndex=" << iq.getAuthZoneIndex ()
-    << " OriginalQuery=(" << iq.getQuery () << ")"
-    << " LastReponse=$" << iq.getLastResponse () << "$"
-    << " LastInterest=" << iq.getLastInterest ().getName().toUri();
+  os << "InterativeQuery: dstLabel=" << iq.getQuery().getRrLabel().toUri() << " currentStep="
+     << toString(iq.getStep()) << " finishedLabel=" << iq.getFinishedLabelNum() << " rrLabelen="
+     << iq.getRrLabelLen() << " NextAuZoneIndex=" << iq.getAuthZoneIndex() << " OriginalQuery=("
+     << iq.getQuery() << ")" << " LastReponse=$" << iq.getLastResponse() << "$" << " LastInterest="
+     << iq.getLastInterest().getName().toUri();
 
   return os;
 }

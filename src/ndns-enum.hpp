@@ -23,8 +23,6 @@
 namespace ndn {
 namespace ndns {
 
-
-
 enum RRType
 {
   RR_NS = 1,
@@ -37,7 +35,7 @@ enum RRType
   RR_UNKNOWN
 };
 inline std::string
-toString (const RRType& type)
+toString(const RRType& type)
 {
   std::string str;
 
@@ -71,7 +69,7 @@ toString (const RRType& type)
 }
 
 inline RRType
-toRRType (const std::string& str)
+toRRType(const std::string& str)
 {
   RRType atype;
   if (str == "NS") {
@@ -113,7 +111,7 @@ enum ResponseType
 };
 
 inline std::string
-toString (ResponseType responseType)
+toString(ResponseType responseType)
 {
   std::string label;
   switch (responseType) {
@@ -140,7 +138,7 @@ toString (ResponseType responseType)
 }
 
 inline ResponseType
-toResponseType (const std::string& str)
+toResponseType(const std::string& str)
 {
   ResponseType atype;
   if (str == "NDNS-Resp") {
@@ -171,7 +169,7 @@ enum QueryType
 };
 
 inline std::string
-toString (const QueryType& qType)
+toString(const QueryType& qType)
 {
   std::string label;
   switch (qType) {
@@ -193,7 +191,7 @@ toString (const QueryType& qType)
 }
 
 inline const QueryType
-toQueryType (const std::string& str)
+toQueryType(const std::string& str)
 {
   QueryType atype;
   if (str == "DNS") {
@@ -225,7 +223,7 @@ enum QuerySteps
 };
 
 inline std::string
-toString (const QuerySteps& step)
+toString(const QuerySteps& step)
 {
   std::string label;
   switch (step) {
@@ -261,7 +259,7 @@ toString (const QuerySteps& step)
 }
 
 inline QuerySteps
-toQuerySteps (std::string str)
+toQuerySteps(std::string str)
 {
   QuerySteps step = QUERY_STEP_UNKNOWN;
   if (str == "NSQuery") {
@@ -289,7 +287,6 @@ toQuerySteps (std::string str)
 
   return step;
 }
-
 
 enum UpdateAction
 {
@@ -349,7 +346,6 @@ toString(UpdateAction action)
 
   return str;
 }
-
 
 } //namespace ndns;
 } //namespace ndn

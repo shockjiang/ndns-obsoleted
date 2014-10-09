@@ -26,18 +26,18 @@ namespace tests {
 
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(Zone)
+BOOST_AUTO_TEST_SUITE (Zone)
 
 BOOST_AUTO_TEST_CASE(Encode)
 {
   string label = "Zone:Encode";
-  printbegin (label);
+  printbegin(label);
 
-  printend (label);
+  printend(label);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace tests
-} // namespace ndns
+}// namespace tests
+}// namespace ndns
 } // namespace ndn

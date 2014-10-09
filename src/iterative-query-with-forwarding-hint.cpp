@@ -22,19 +22,19 @@
 namespace ndn {
 namespace ndns {
 
-IterativeQueryWithForwardingHint::IterativeQueryWithForwardingHint (const Query& query)
-  : IterativeQuery (query)
-  , m_forwardingHintIndex (0)
+IterativeQueryWithForwardingHint::IterativeQueryWithForwardingHint(const Query& query)
+  : IterativeQuery(query),
+    m_forwardingHintIndex(0)
 {
 
 }
 
-IterativeQueryWithForwardingHint::~IterativeQueryWithForwardingHint ()
+IterativeQueryWithForwardingHint::~IterativeQueryWithForwardingHint()
 {
 }
 
 void
-IterativeQueryWithForwardingHint::abort ()
+IterativeQueryWithForwardingHint::abort()
 {
   std::cout << "QUERY_STEP_Abort the Resolving" << std::endl;
   std::cout << (*this);
@@ -42,27 +42,27 @@ IterativeQueryWithForwardingHint::abort ()
 }
 
 bool
-IterativeQueryWithForwardingHint::doTimeout ()
+IterativeQueryWithForwardingHint::doTimeout()
 {
-  abort ();
+  abort();
   return false;
 }
 
 void
-IterativeQueryWithForwardingHint::doData (Data& data)
+IterativeQueryWithForwardingHint::doData(Data& data)
 {
-  std::cout << "[* -> *] resolve Data: " << data.getName ().toUri () << std::endl;
+  std::cout << "[* -> *] resolve Data: " << data.getName().toUri() << std::endl;
   Response re;
-  re.fromData (data);
+  re.fromData(data);
   std::cout << re << std::endl;
   //std::cout<<"step 1"<<std::endl;
-  if (re.getResponseType () == RESPONSE_UNKNOWN) {
+  if (re.getResponseType() == RESPONSE_UNKNOWN) {
     std::cout << "[* !! *] unknown content type and exit";
     m_step = QUERY_STEP_Abort;
-    abort ();
+    abort();
     return;
   }
-  else if (re.getResponseType () == RESPONSE_NDNS_Nack) {
+  else if (re.getResponseType() == RESPONSE_NDNS_Nack) {
     if (m_step == QUERY_STEP_NSQuery) {
       //In fact, there are two different situations
       //1st: /net/ndnsim/DNS/www/NS is nacked
@@ -85,20 +85,20 @@ IterativeQueryWithForwardingHint::doData (Data& data)
       else {
         m_step = QUERY_STEP_RRQuery;
       }
-    }// fi(NSQuery after geting Nack)
+    }      // fi(NSQuery after geting Nack)
     else if (m_step == QUERY_STEP_RRQuery) {
       m_step = QUERY_STEP_AnswerStub;
     }
     else if (m_step == QUERY_STEP_FHQuery) {
       m_step = QUERY_STEP_Abort;
-      abort ();
+      abort();
     }
     m_lastResponse = re;
   }
-  else if (re.getResponseType () == RESPONSE_NDNS_Auth) { // need more specific info
+  else if (re.getResponseType() == RESPONSE_NDNS_Auth) { // need more specific info
     m_rrLabelLen += 1;
   }
-  else if (re.getResponseType () == RESPONSE_NDNS_Resp) { // get the intermediate answer
+  else if (re.getResponseType() == RESPONSE_NDNS_Resp) { // get the intermediate answer
     //std::cout<<"step 2"<<std::endl;
     if (m_step == QUERY_STEP_NSQuery) {
       m_step = QUERY_STEP_FHQuery;
@@ -119,8 +119,8 @@ IterativeQueryWithForwardingHint::doData (Data& data)
       m_finishedLabelNum += m_rrLabelLen;
       m_rrLabelLen = 1;
       m_authZoneIndex = 0;
-      RR rr = re.getRrs ()[m_forwardingHintIndex];
-      m_forwardingHint = Name (rr.getRrData ());
+      RR rr = re.getRrs()[m_forwardingHintIndex];
+      m_forwardingHint = Name(rr.getRrData());
 
     }
     else if (m_step == QUERY_STEP_RRQuery) { // final resolver gets result back
@@ -138,48 +138,48 @@ IterativeQueryWithForwardingHint::doData (Data& data)
  *      [QUERY_STEP_RRQuery, QUERY_STEP_NSQuery, QUERY_STEP_FHQuery]
  */
 const Interest
-IterativeQueryWithForwardingHint::toLatestInterest ()
+IterativeQueryWithForwardingHint::toLatestInterest()
 {
 
-  Query query = Query ();
-  Name dstLabel = m_query.getRrLabel ();
+  Query query = Query();
+  Name dstLabel = m_query.getRrLabel();
 
-  Name authZone = dstLabel.getPrefix (m_finishedLabelNum);
+  Name authZone = dstLabel.getPrefix(m_finishedLabelNum);
 
   Name label;
   if (m_step == QUERY_STEP_RRQuery) {
-    label = dstLabel.getSubName (m_finishedLabelNum);
-    query.setRrType (m_query.getRrType ());
-    if (m_query.getRrType () == RR_ID_CERT) {
-      query.setQueryType (QUERY_KEY);
-      query.setQueryType (QUERY_DNS);
+    label = dstLabel.getSubName(m_finishedLabelNum);
+    query.setRrType(m_query.getRrType());
+    if (m_query.getRrType() == RR_ID_CERT) {
+      query.setQueryType(QUERY_KEY);
+      query.setQueryType(QUERY_DNS);
     }
     else {
-      query.setQueryType (QUERY_DNS);
+      query.setQueryType(QUERY_DNS);
     }
   }
   else if (m_step == QUERY_STEP_NSQuery) {
-    label = dstLabel.getSubName (m_finishedLabelNum, m_rrLabelLen);
-    query.setRrType (RR_NS);
-    query.setQueryType (QUERY_DNS);
+    label = dstLabel.getSubName(m_finishedLabelNum, m_rrLabelLen);
+    query.setRrType(RR_NS);
+    query.setQueryType(QUERY_DNS);
 
   }
   else if (m_step == QUERY_STEP_FHQuery) {
-    RR rr = m_lastResponse.getRrs ()[m_authZoneIndex];
-    label = Name (rr.getRrData ());
-    query.setRrType (RR_FH);
-    query.setQueryType (QUERY_DNS);
+    RR rr = m_lastResponse.getRrs()[m_authZoneIndex];
+    label = Name(rr.getRrData());
+    query.setRrType(RR_FH);
+    query.setQueryType(QUERY_DNS);
   }
   else {
     std::cout << "[* !!!! *] should not be called. toLatestInterest: " << *this << std::endl;
     return m_lastInterest;
   }
 
-  query.setRrLabel (label);
-  query.setAuthorityZone (authZone);
-  query.setFowardingHint (m_forwardingHint);
+  query.setRrLabel(label);
+  query.setAuthorityZone(authZone);
+  query.setFowardingHint(m_forwardingHint);
   //std::cout<<"--------------lastFH="<<m_lastForwardingHint<<std::endl;
-  Interest interest = query.toInterest ();
+  Interest interest = query.toInterest();
 
   return interest;
 }

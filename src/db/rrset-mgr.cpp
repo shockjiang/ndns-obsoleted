@@ -22,63 +22,62 @@
 namespace ndn {
 namespace ndns {
 
-RRSetMgr::RRSetMgr ()
+RRSetMgr::RRSetMgr()
 {
 
 }
 
-RRSetMgr::~RRSetMgr ()
+RRSetMgr::~RRSetMgr()
 {
 }
 
 bool
-RRSetMgr::insert ()
+RRSetMgr::insert()
 {
-  std::vector<RRSet*>::iterator iter = m_rrsets.begin ();
+  std::vector<RRSet*>::iterator iter = m_rrsets.begin();
   std::string sql;
-  this->open ();
+  this->open();
 
-  while (iter != m_rrsets.end ()) {
+  while (iter != m_rrsets.end()) {
     sql = "INSERT INTO rrsets (zone_id, label, class, type, ndndata) VALUES";
 
     RRSet& rrset = **iter;
     sql += " (";
-    sql += std::to_string (rrset.getZone ().getId ()) + ", ";
-    sql += "\'" + rrset.getLabel ().toUri() + "\', ";
-    sql += "\'" + rrset.getClass () + "\', ";
-    sql += "\'" + ndn::ndns::toString (rrset.getType ()) + "\', ";
+    sql += std::to_string(rrset.getZone().getId()) + ", ";
+    sql += "\'" + rrset.getLabel().toUri() + "\', ";
+    sql += "\'" + rrset.getClass() + "\', ";
+    sql += "\'" + ndn::ndns::toString(rrset.getType()) + "\', ";
     sql += "NULL";
     sql += ")";
 
-
-    this->executeOnly (sql, static_callback_doNothing, this);
-    rrset.setId(sqlite3_last_insert_rowid (this->m_conn));
+    this->executeOnly(sql, static_callback_doNothing, this);
+    rrset.setId(sqlite3_last_insert_rowid(this->m_conn));
     //std::cout<<"just insert: "<<rrset<<std::endl;
 
     iter++;
   }
 
-  this->close ();
+  this->close();
 
   return true;
 }
 
 void
-RRSetMgr::lookupIds ()
+RRSetMgr::lookupIds()
 {
   std::string sql;
-  std::vector<RRSet*>::iterator iter = m_rrsets.begin ();
+  std::vector<RRSet*>::iterator iter = m_rrsets.begin();
   this->open();
-  while (iter != m_rrsets.end ()) {
+  while (iter != m_rrsets.end()) {
     RRSet& rrset = **iter;
     sql = "SELECT id FROM rrsets WHERE zone_id=";
-    sql += std::to_string (rrset.getZone ().getId ());
-    sql += " AND label=\'" + rrset.getLabel ().toUri() + "\'";
-    sql += " AND type=\'" + toString (rrset.getType ()) + "\'";
+    sql += std::to_string(rrset.getZone().getId());
+    sql += " AND label=\'" + rrset.getLabel().toUri() + "\'";
+    sql += " AND type=\'" + toString(rrset.getType()) + "\'";
 
     this->setTempInt(0);
-    this->executeOnly (sql, this->static_callback_getInt, this);
-    rrset.setId (this->getTempInt ());
+    this->executeOnly(sql, this->static_callback_getInt, this);
+    rrset.setId(this->getTempInt());
 
     iter++;
   }
@@ -86,17 +85,16 @@ RRSetMgr::lookupIds ()
   this->close();
 }
 
-
 void
-RRSetMgr::removeRelatedRRs ()
+RRSetMgr::removeRelatedRRs()
 {
   std::string sql;
-  std::vector<RRSet*>::iterator iter = m_rrsets.begin ();
+  std::vector<RRSet*>::iterator iter = m_rrsets.begin();
   this->open();
-  while (iter != m_rrsets.end ()) {
+  while (iter != m_rrsets.end()) {
     RRSet& rrset = **iter;
     sql = "DELETE FROM rrs where rrset_id=";
-    sql += std::to_string (rrset.getId ());
+    sql += std::to_string(rrset.getId());
     this->executeOnly(sql, this->static_callback_doNothing, this);
     iter++;
   }

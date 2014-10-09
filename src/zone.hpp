@@ -33,34 +33,34 @@ class Zone
 
 public:
 
-  Zone (const Name& name);
-  Zone (const std::string name);
-  Zone (const char* name);
+  Zone(const Name& name);
+  Zone(const std::string name);
+  Zone(const char* name);
 
-  Zone ();
+  Zone();
   virtual
-  ~Zone ();
+  ~Zone();
 
   const Name&
-  getAuthorizedName () const
+  getAuthorizedName() const
   {
     return m_authorizedName;
   }
 
   void
-  setAuthorizedName (const Name& authorizedName)
+  setAuthorizedName(const Name& authorizedName)
   {
     m_authorizedName = authorizedName;
   }
 
   uint32_t
-  getId () const
+  getId() const
   {
     return m_id;
   }
 
   void
-  setId (uint32_t id)
+  setId(uint32_t id)
   {
     m_id = id;
   }
@@ -72,11 +72,9 @@ private:
 //class Zone
 
 inline std::ostream&
-operator<< (std::ostream& os, const Zone& zone)
+operator<<(std::ostream& os, const Zone& zone)
 {
-  os << "Zone: Id=" << zone.getId ()
-     << " Name=" << zone.getAuthorizedName ().toUri ()
-     << "";
+  os << "Zone: Id=" << zone.getId() << " Name=" << zone.getAuthorizedName().toUri() << "";
   return os;
 }
 

@@ -29,94 +29,94 @@ namespace ndns {
 class RRSet
 {
 public:
-  RRSet (Zone & zone);
-  RRSet ();
+  RRSet(Zone & zone);
+  RRSet();
 
   virtual
-  ~RRSet ();
+  ~RRSet();
 
   void
-  setZone (const Name& zoneName)
+  setZone(const Name& zoneName)
   {
     m_zone.setAuthorizedName(zoneName);
   }
 
   const std::string&
-  getClass () const
+  getClass() const
   {
     return m_class;
   }
 
   void
-  setClass (const std::string& clazz)
+  setClass(const std::string& clazz)
   {
     m_class = clazz;
   }
 
   uint32_t
-  getId () const
+  getId() const
   {
     return m_id;
   }
 
   void
-  setId (uint32_t id)
+  setId(uint32_t id)
   {
     m_id = id;
   }
 
   const std::string&
-  getNdndata () const
+  getNdndata() const
   {
     return m_ndndata;
   }
 
   void
-  setNdndata (const std::string& ndndata)
+  setNdndata(const std::string& ndndata)
   {
     m_ndndata = ndndata;
   }
 
   RRType
-  getType () const
+  getType() const
   {
     return m_type;
   }
 
   void
-  setType (RRType type)
+  setType(RRType type)
   {
     m_type = type;
   }
 
   const Zone&
-  getZone () const
+  getZone() const
   {
     return m_zone;
   }
 
   /*
-  RRSet&
-  operator= (const RRSet& rrset)
-  {
-    return *this;
-  }
-  */
+   RRSet&
+   operator= (const RRSet& rrset)
+   {
+   return *this;
+   }
+   */
 
   const Name&
-  getLabel () const
+  getLabel() const
   {
     return m_label;
   }
 
   void
-  setLabel (const Name& label)
+  setLabel(const Name& label)
   {
     m_label = label;
   }
 
   void
-  setZone (const Zone& zone)
+  setZone(const Zone& zone)
   {
     m_zone = zone;
   }
@@ -132,12 +132,10 @@ private:
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const RRSet& rrset)
+operator<<(std::ostream& os, const RRSet& rrset)
 {
-  os << "RRSet: Id=" << rrset.getId ()
-     << " Zone=(" << rrset.getZone() << ")"
-     << " Label=" << rrset.getLabel ().toUri()
-     << " Type=" << toString (rrset.getType ());
+  os << "RRSet: Id=" << rrset.getId() << " Zone=(" << rrset.getZone() << ")" << " Label="
+     << rrset.getLabel().toUri() << " Type=" << toString(rrset.getType());
   return os;
 }
 

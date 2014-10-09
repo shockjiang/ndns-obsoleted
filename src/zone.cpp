@@ -22,30 +22,30 @@
 namespace ndn {
 namespace ndns {
 
-Zone::Zone (const Name& name)
-  : m_id (0)
-  , m_authorizedName (name)
+Zone::Zone(const Name& name)
+  : m_id(0),
+    m_authorizedName(name)
 {
 }
 
-Zone::Zone ()
-  : m_id (0)
+Zone::Zone()
+  : m_id(0)
 {
 }
 
-Zone::Zone (const char* name)
-  : m_id (0)
-  , m_authorizedName (name)
+Zone::Zone(const char* name)
+  : m_id(0),
+    m_authorizedName(name)
 {
 }
 
-Zone::Zone (const std::string name)
-  : m_id (0)
-  , m_authorizedName (name)
+Zone::Zone(const std::string name)
+  : m_id(0),
+    m_authorizedName(name)
 {
 }
 
-Zone::~Zone ()
+Zone::~Zone()
 {
 }
 

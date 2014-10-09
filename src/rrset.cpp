@@ -22,24 +22,24 @@
 namespace ndn {
 namespace ndns {
 
-RRSet::RRSet (Zone& zone)
-  : m_id (0Lu)
-  , m_zone (zone)
-  , m_type (RR_NS)
+RRSet::RRSet(Zone& zone)
+  : m_id(0Lu),
+    m_zone(zone),
+    m_type(RR_NS)
 {
 
 }
 
-RRSet::~RRSet ()
+RRSet::~RRSet()
 {
 }
 
 } /* namespace ndns */
 } /* namespace ndn */
 
-ndn::ndns::RRSet::RRSet ()
-  : m_id (0Lu)
-  , m_zone ()
-  , m_type (RR_NS)
+ndn::ndns::RRSet::RRSet()
+  : m_id(0Lu),
+    m_zone(),
+    m_type(RR_NS)
 {
 }

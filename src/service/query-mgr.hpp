@@ -36,32 +36,32 @@ namespace ndns {
 class QueryMgr : public DBMgr
 {
 public:
-  QueryMgr (Zone& zone, Query& query, Response& response);
+  QueryMgr(Zone& zone, Query& query, Response& response);
   virtual
-  ~QueryMgr ();
+  ~QueryMgr();
 
   void
-  lookup ();
+  lookup();
   int
-  callback_getRr (int argc, char **argv, char **azColName);
+  callback_getRr(int argc, char **argv, char **azColName);
 
   static int
-  static_callback_getRr (void *param, int argc, char **argv, char **azColName)
+  static_callback_getRr(void *param, int argc, char **argv, char **azColName)
   {
-    QueryMgr *mgr = reinterpret_cast<QueryMgr*> (param);
-    return mgr->callback_getRr (argc, argv, azColName);
+    QueryMgr *mgr = reinterpret_cast<QueryMgr*>(param);
+    return mgr->callback_getRr(argc, argv, azColName);
   }
 
   /*@brief
    * whether we should reply NDNS_Auth instead of NDNS_Nack
    */
   int
-  hasAuth ();
+  hasAuth();
 
   inline void
-  addRR (RR& rr)
+  addRR(RR& rr)
   {
-    m_rrs.push_back (rr);
+    m_rrs.push_back(rr);
   }
 
 private:

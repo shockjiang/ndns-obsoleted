@@ -36,27 +36,26 @@ namespace ndns {
 class DynamicDNSUpdate : public NDNApp
 {
 public:
-  DynamicDNSUpdate (const char* programName, const char* prefix, Zone zone, Name rrlabel,
-    RRType rrtype, std::string rrdata, UpdateAction action=ndn::ndns::UPDATE_ACTION_REPLACE_ALL);
+  DynamicDNSUpdate(const char* programName, const char* prefix, Zone zone, Name rrlabel,
+    RRType rrtype, std::string rrdata, UpdateAction action = ndn::ndns::UPDATE_ACTION_REPLACE_ALL);
 
   virtual
-  ~DynamicDNSUpdate ();
+  ~DynamicDNSUpdate();
 
   /**
    * @brief construct a query (interest) which contains the update information
    */
   Interest
-  toInterest ();
-
-
-  void
-  onData (const ndn::Interest& interest, Data& data);
+  toInterest();
 
   void
-  onTimeout (const ndn::Interest& interest);
+  onData(const ndn::Interest& interest, Data& data);
 
   void
-  run ();
+  onTimeout(const ndn::Interest& interest);
+
+  void
+  run();
 
   void
   send(const Interest& interest);
@@ -65,97 +64,97 @@ public:
   send();
 
   const ResponseUpdate&
-  getResponse () const
+  getResponse() const
   {
     return m_response;
   }
 
   void
-  setResponse (const ResponseUpdate& response)
+  setResponse(const ResponseUpdate& response)
   {
     m_response = response;
   }
 
   const std::string&
-  getRrData () const
+  getRrData() const
   {
     return m_rrData;
   }
 
   void
-  setRrData (const std::string& rrData)
+  setRrData(const std::string& rrData)
   {
     m_rrData = rrData;
   }
 
   const Name&
-  getRrLabel () const
+  getRrLabel() const
   {
     return m_rrLabel;
   }
 
   void
-  setRrLabel (const Name& rrLabel)
+  setRrLabel(const Name& rrLabel)
   {
     m_rrLabel = rrLabel;
   }
 
   RRType
-  getRrType () const
+  getRrType() const
   {
     return m_rrType;
   }
 
   void
-  setRrType (RRType rrType)
+  setRrType(RRType rrType)
   {
     m_rrType = rrType;
   }
 
   const Response&
-  getUpdate () const
+  getUpdate() const
   {
     return m_update;
   }
 
   void
-  setUpdate (const Response& update)
+  setUpdate(const Response& update)
   {
     m_update = update;
   }
 
   UpdateAction
-  getAction () const
+  getAction() const
   {
     return m_action;
   }
 
   void
-  setAction (UpdateAction action)
+  setAction(UpdateAction action)
   {
     m_action = action;
   }
 
   const QueryUpdate&
-  getQueryUpdate () const
+  getQueryUpdate() const
   {
     return m_queryUpdate;
   }
 
   void
-  setQueryUpdate (const QueryUpdate& queryUpdate)
+  setQueryUpdate(const QueryUpdate& queryUpdate)
   {
     m_queryUpdate = queryUpdate;
   }
 
   const Zone&
-  getZone () const
+  getZone() const
   {
     return m_zone;
   }
 
   void
-  setZone (const Zone& zone)
+  setZone(const Zone& zone)
   {
     m_zone = zone;
   }
@@ -169,7 +168,6 @@ private:
   Response m_update;
 
   QueryUpdate m_queryUpdate;
-
 
   /**
    *

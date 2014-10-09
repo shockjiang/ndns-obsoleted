@@ -29,54 +29,54 @@ class IterativeQueryWithForwardingHint : public IterativeQuery
 {
 
 public:
-  IterativeQueryWithForwardingHint (const Query& query);
+  IterativeQueryWithForwardingHint(const Query& query);
   virtual
-  ~IterativeQueryWithForwardingHint ();
+  ~IterativeQueryWithForwardingHint();
 
   const Interest
-  toLatestInterest ();
+  toLatestInterest();
 
   void
-  doData (Data& data);
+  doData(Data& data);
 
   bool
-  doTimeout ();
+  doTimeout();
 
   void
-  abort ();
+  abort();
 
   unsigned int
-  getForwardingHintIndex () const
+  getForwardingHintIndex() const
   {
     return m_forwardingHintIndex;
   }
 
   void
-  setForwardingHintIndex (unsigned int forwardingHintIndex)
+  setForwardingHintIndex(unsigned int forwardingHintIndex)
   {
     m_forwardingHintIndex = forwardingHintIndex;
   }
 
   const Name&
-  getForwardingHint () const
+  getForwardingHint() const
   {
     return m_forwardingHint;
   }
 
   void
-  setForwardingHint (const Name& forwardingHint)
+  setForwardingHint(const Name& forwardingHint)
   {
     m_forwardingHint = forwardingHint;
   }
 
   const Name&
-  getLastForwardingHint () const
+  getLastForwardingHint() const
   {
     return m_lastForwardingHint;
   }
 
   void
-  setLastForwardingHint (const Name& lastForwardingHint)
+  setLastForwardingHint(const Name& lastForwardingHint)
   {
     m_lastForwardingHint = lastForwardingHint;
   }
@@ -94,18 +94,14 @@ private:
 };
 
 inline std::ostream&
-operator<< (std::ostream& os, const IterativeQueryWithForwardingHint iq)
+operator<<(std::ostream& os, const IterativeQueryWithForwardingHint iq)
 {
-  os << "IterativeQueryWithFowardingHint: dstLabel="
-    << iq.getQuery ().getRrLabel ().toUri ()
-     << " currentStep=" << toString (iq.getStep ())
-     << " finishedLabel=" << iq.getFinishedLabelNum ()
-     << " FHint=" << iq.getForwardingHint ().toUri ()
-     << " rrLabelen=" << iq.getRrLabelLen ()
-     << " NextAuZoneIndex=" << iq.getAuthZoneIndex ()
-     << " OriginalQuery=[" << iq.getQuery () << "]"
-     << " LastReponse=$" << iq.getLastResponse () << "$"
-     << " LastInterest=" << iq.getLastInterest ().getName().toUri();
+  os << "IterativeQueryWithFowardingHint: dstLabel=" << iq.getQuery().getRrLabel().toUri()
+     << " currentStep=" << toString(iq.getStep()) << " finishedLabel=" << iq.getFinishedLabelNum()
+     << " FHint=" << iq.getForwardingHint().toUri() << " rrLabelen=" << iq.getRrLabelLen()
+     << " NextAuZoneIndex=" << iq.getAuthZoneIndex() << " OriginalQuery=[" << iq.getQuery() << "]"
+     << " LastReponse=$" << iq.getLastResponse() << "$" << " LastInterest="
+     << iq.getLastInterest().getName().toUri();
 
   return os;
 }
