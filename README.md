@@ -1,3 +1,5 @@
+WARNNING: This is an obsoleted implementation of NDNS, and will not be maintained any more. The only goal to keep the code here is to reserve the historical record.
+
 NDNS: Domain Name Service for Named Data Networking
 ===================================================
 
